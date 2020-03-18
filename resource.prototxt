@@ -1,0 +1,42 @@
+name: "resource"
+cloudlayer {
+  datacenters {
+    location: "阿里云"
+    cloudnodes {
+      id: "db-6"
+      location: "阿里云-1"
+      cpu: 5
+      memory: 10240
+      store: 20480
+    }
+  }
+}
+networklayer {
+  netnodes {
+    id: "db-8"
+    location: "小作坊"
+    cpu: 5
+    memory: 10240
+    store: 20480
+  }
+}
+endlayer {
+  rooms {
+    location: "G514"
+    devices {
+      name: "风扇"
+      id: "db-15"
+    }
+  }
+  rooms {
+    location: "G513"
+    devices {
+      name: "灯"
+      id: "db-12"
+    }
+    devices {
+      name: "壶"
+      id: "db-13"
+    }
+  }
+}

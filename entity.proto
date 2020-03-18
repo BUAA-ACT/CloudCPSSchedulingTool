@@ -1,0 +1,98 @@
+syntax = "proto2";
+
+message Entity {
+  required string name = 1;
+  required CloudLayer cloudlayer = 2;
+  required NetworkLayer networklayer = 3;
+  required EndLayer endlayer = 4;
+  required Link links = 5;
+}
+
+message Link {
+  required string source = 1;
+  required string target = 2;
+}
+
+message CloudLayer {
+  repeated Datacenter datacenters = 2;
+}
+
+message Datacenter {
+  optional string id = 1;
+  required string location = 2;
+  optional string name = 3;
+  repeated CloudNode cloudnodes = 4;
+}
+
+message CloudNode {
+  optional string name = 1;
+  required string id = 2; // 对需求来说是有向图的ID，对资源来说是数据库ID
+  required string location = 3;
+  optional int32 cpu = 4; // 需求端不需要在CloudNone处给出资源信息（在Container给出），资源端要给出
+  optional int32 memory = 5;
+  optional int32 store = 6;
+  repeated Container containers = 7;
+}
+
+message Container {
+  optional string name = 1;
+  required int32 cpu = 2;
+  required int32 memory = 3;
+  required int32 store = 4;
+  required string id = 5;
+}
+
+message NetworkLayer {
+  repeated NetNode netnodes = 1;
+  repeated EdgeServer edgeserver = 2;
+}
+
+message NetNode {
+  optional string name = 1;
+  required string id = 2;
+  required string location = 3;
+  optional int32 cpu = 4;
+  optional int32 memory = 5;
+  optional int32 store = 6;
+  repeated Container containers = 7;
+}
+
+message EdgeServer {
+  optional string name = 1;
+  required string id = 2;
+  required string location = 3;
+  optional int32 cpu = 4;
+  optional int32 memory = 5;
+  optional int32 store = 6;
+  repeated Container containers = 7;
+}
+
+message EndLayer {
+  // repeated Device devices = 2; 这些将被放到GeneralRoom
+  // repeated Worker workers = 3;
+  // repeated Application applications = 4;
+  repeated Room rooms = 1;
+}
+
+message Room {
+  optional string name = 1;
+  required string location = 2;
+  repeated Device devices = 3;
+  repeated Worker workers = 4;
+  repeated Application applications = 5;
+}
+
+message Device {
+  required string name = 1;
+  required string id = 2;
+}
+
+message Worker {
+  required string name = 1;
+  required string id = 2;
+}
+
+message Application {
+  required string name = 1;
+  required string id = 2;
+}

@@ -1,0 +1,74 @@
+{
+  "Name": "单机计算多机计算模型",
+  "EndLayer": {
+    "Devices": [
+      {
+        "DeviceID": "15",
+        "Name": "风扇"
+      }
+    ],
+    "Rooms": [
+      {
+        "Location": "G513",
+        "Devices": [
+          {
+            "DeviceID": "12",
+            "Name": "灯"
+          },
+          {
+            "DeviceID": "13",
+            "Name": "壶"
+          }
+        ]
+      }
+    ]
+  },
+  "CloudLayer": {
+    "Datacenters": [
+      {
+        "DatacenterID": "5",
+        "Location": "阿里云",
+        "CloudNodes": [
+          {
+            "CloudNodeID": "6",
+            "Location": "阿里云-1",
+            "Containers": [
+              {
+                "CpuNumber": "2",
+                "Memory": "1024",
+                "Store": "2048",
+                "ContainerID": "7"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "NetworkLayer": {
+    "NetNodes": [
+      {
+        "NetNodeID": "8",
+        "Location": "小作坊"
+      }
+    ]
+  },
+  "Links": [
+    {
+      "source": "7",
+      "target": "8"
+    },
+    {
+      "source": "8",
+      "target": "15"
+    },
+    {
+      "source": "8",
+      "target": "13"
+    },
+    {
+      "source": "8",
+      "target": "12"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+name: "demand"
+cloudlayer {
+  datacenters {
+    location: "阿里云"
+    cloudnodes {
+      id: "6"
+      location: "阿里云-1"
+      containers {
+        cpu: 2
+        memory: 1024
+        store: 2048
+        id: "7"
+      }
+    }
+  }
+}
+networklayer {
+  netnodes {
+    id: "8"
+    location: "小作坊"
+  }
+}
+endlayer {
+  rooms {
+    location: "G513"
+    devices {
+      name: "灯"
+      id: "12"
+    }
+    devices {
+      name: "壶"
+      id: "13"
+    }
+  }
+  rooms {
+    name: "GeneralRoom"
+    location: "Logical"
+    devices {
+      name: "风扇"
+      id: "15"
+    }
+  }
+}

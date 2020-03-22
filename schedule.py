@@ -5,34 +5,7 @@
 import json
 import entity_pb2
 from google.protobuf import text_format
-
-class Entity(list):
-    
-    def __init__(self, entype, demandid=-1, databaseid=-1, 
-            name=None, desc=None, location=None,
-            ncpu=None, mem=None, store=None):
-        super(list, self).__init__()
-        self.type = entype
-        self.demandid = demandid
-        self.databaseid = databaseid
-        self.name = name
-        self.desc = desc
-        self.location = location
-        self.ncpu = ncpu
-        self.mem = mem
-        self.store = store
-
-def entity_str(entity, dep=0):
-    typestr = entity.type
-    itemstr = ''
-    for item in entity:
-        tmp = entity_str(item, dep+1)
-        if tmp.strip() != '':
-            itemstr += '\n' + tmp
-    if itemstr.strip() != '':
-        itemstr += '\n' + ' ' * 2 * dep
-    return ' ' * 2 * dep + f'{typestr}({entity.name}):' \
-            + f'[{itemstr}]'
+import database
 
 def parse_json_to_entity(jsonObj, entype):
 
@@ -233,8 +206,28 @@ def receive(jsonObj):
     return parse_json_to_entity(jsonObj, 'App')
 
 
-def queryResources(jsonObj):
-    pass # 当前可用的entity
+def queryResources(database):
+    entity = entity_pb2.Entity()
+    entity.name = 'resources'
+    servers = database.queryNewestItems('serverinfo',
+            samelabel='id', timelabel='time')
+    for server in servers:
+        [sid, name, ip, cpuUsage, diskIORead, diskIOWrite,
+                diskUsed, memoryUsed, networkUploadRate,
+                networkDownloadRate, time] = server
+        print(f"id: %d, cpuUsage: {cpuUsage}" % sid)
+    containers = database.queryNewestItems('dockerinfo',
+            samelabel='dockerId', timelabel='time')
+    for container in containers:
+        [sid, name, dockerid, cpuUsage, memUsage,
+                diskIORead, diskIOWrite, memoryUsed,
+                networkIORead, networkIOWrite, time] = container
+        print(f'id: {dockerid}')
+    devices = database.queryItems('deviceinfo', 'inroom="True"')
+    for device in devices:
+        [did, localip, inroom, token, dtype, model,
+                name, data, location, timestamp] = device
+        print(f"id: {did}, inroom: {inroom}, name: {name}, location: {location}")
 
 
 def fit(demands, resources):
@@ -449,6 +442,10 @@ def print_proto(proto):
     print(text)
 
 if __name__ == '__main__':
+    #  database_manager = database.DatabaseManager('39.104.154.79',
+            #  'wangch', '20191104wc', 'root', '20191104', 'node_infos')
+    #  queryResources(database_manager)
+    #  database_manager.__del__()
     with open('./demand.hrm') as f:
         jsonObj = json.loads(f.read())
         demands = receive(jsonObj)

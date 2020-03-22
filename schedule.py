@@ -7,8 +7,8 @@ import entity_pb2
 from google.protobuf import text_format
 
 class Entity(list):
-
-    def __init__(self, entype, demandid=-1, databaseid=-1,
+    
+    def __init__(self, entype, demandid=-1, databaseid=-1, 
             name=None, desc=None, location=None,
             ncpu=None, mem=None, store=None):
         super(list, self).__init__()
@@ -229,7 +229,7 @@ def parse_json_to_entity(jsonObj, entype):
     return parse[entype](jsonObj)
 
 
-def receive(jsonObj):
+def receive(jsonObj):    
     return parse_json_to_entity(jsonObj, 'App')
 
 
@@ -251,9 +251,9 @@ def fit(demands, resources):
         return bipartite_graph_matching(demands, resources)
 
 
-def dfs(demand_idx, demand, resources, used, match, dfs_type):
+def dfs(demand_idx, demand, resources, used, match, dfs_type, res):
     for resource_idx, resource in enumerate(resources):
-        if bipartite_graph_match(demand, resource, dfs_type) and not used[resource_idx]:
+        if bipartite_graph_match(demand, resource, dfs_type, res) and not used[resource_idx]:
             used[resource_idx] = True
             if match[resource_idx] == -1 or \
                     dfs(match[resource_idx], demand, resources, used, match, dfs_type):
@@ -262,7 +262,7 @@ def dfs(demand_idx, demand, resources, used, match, dfs_type):
     return False
 
 
-def bipartite_graph_match(demands, resources, match_type):
+def bipartite_graph_match(demands, resources, match_type, res):
     if match_type == 'cloudlayer':
         dn = len(demands.datacenters)
         an = len(resources.datacenters)
@@ -270,10 +270,12 @@ def bipartite_graph_match(demands, resources, match_type):
         match = [-1 for x in range(an)]
         for demand_idx, demand in enumerate(demands.datacenters):
             used = [0 for x in range(dn)]
-            if dfs(demand_idx, demand, resources.datacenters,
-                    used, match, 'datacenters'):
+            if dfs(demand_idx, demand, resources.datacenters, 
+                    used, match, 'datacenters', res):
                 match_num += 1
-        return match if match_num == dn else None
+        if match_num != dn:
+            return False
+        return True
     elif match_type == 'datacenters':
         dn = len(demands.cloudnodes)
         an = len(resources.cloudnodes)
@@ -281,10 +283,14 @@ def bipartite_graph_match(demands, resources, match_type):
         match = [-1 for x in range(an)]
         for demand_idx, demand in enumerate(demands.cloudnodes):
             used = [0 for x in range(dn)]
-            if dfs(demand_idx, demand, resources.cloudnodes,
-                    used, match, 'cloudnodes'):
+            if dfs(demand_idx, demand, resources.cloudnodes, 
+                    used, match, 'cloudnodes', res):
                 match_num += 1
-        return match if match_num == dn else None
+        if match_num != dn:
+            return False
+        res.update({demands.cloudnodes[di].id:resources.cloudnodes[ai].id
+                for ai, di in enumerate(match)})
+        return True
     elif match_type == 'networklayer':
         # netnodes part
         netnodes_dn = len(demands.netnodes)
@@ -293,11 +299,12 @@ def bipartite_graph_match(demands, resources, match_type):
         netnodes_match = [-1 for x in range(netnodes_an)]
         for demand_idx, demand in enumerate(demands.netnodes):
             netnodes_used = [0 for x in range(netnodes_dn)]
-            if dfs(demand_idx, demand, resources.netnodes,
-                    netnodes_used, netnodes_match, 'netnodes'):
+            if dfs(demand_idx, demand, resources.netnodes, 
+                    netnodes_used, netnodes_match,
+                    'netnodes', res):
                 netnodes_match_num += 1
         if netnodes_match_num != netnodes_dn:
-            return None
+            return False
         # edgeservers part
         edgeservers_dn = len(demands.edgeservers)
         edgeservers_an = len(resources.edgeservers)
@@ -305,12 +312,17 @@ def bipartite_graph_match(demands, resources, match_type):
         edgeservers_match = [-1 for x in range(edgeservers_an)]
         for demand_idx, demand in enumerate(demands.edgeservers):
             edgeservers_used = [0 for x in range(edgeservers_dn)]
-            if dfs(demand_idx, demand, resources.edgeservers,
-                    edgeservers_used, edgeservers_match, 'edgeservers'):
+            if dfs(demand_idx, demand, resources.edgeservers, 
+                    edgeservers_used, edgeservers_match,
+                    'edgeservers', res):
                 edgeservers_match_num += 1
         if edgeservers_match_num != edgeservers_dn:
-            return None
-        return [netnodes_match, edgeservers_match]
+            return False
+        res.update({demands.netnodes[di].id:resources.netnodes[ai].id 
+                    for ai, di in enumerate(netnodes_match)})
+        res.update({demands.edgeservers[di].id:resources.edgeservers[ai].id
+                    for ai, di in enumerate(edgeservers_match)})
+        return True
     elif match_type == 'endlayer':
         dn = len(demands.rooms)
         an = len(resources.rooms)
@@ -319,9 +331,11 @@ def bipartite_graph_match(demands, resources, match_type):
         for demand_idx, demand in enumerate(demands.rooms):
             used = [0 for x in range(dn)]
             if dfs(demand_idx, demand, resources.rooms,
-                    used, match, 'rooms'):
+                    used, match, 'rooms', res):
                 match_num += 1
-        return match if match_num == dn else None
+        if match_num != dn:
+            return False
+        return True
     elif match_type == 'rooms':
         # devices part
         devices_dn = len(demands.devices)
@@ -330,11 +344,12 @@ def bipartite_graph_match(demands, resources, match_type):
         devices_match = [-1 for x in range(devices_an)]
         for demand_idx, demand in enumerate(demands.devices):
             devices_used = [0 for x in range(devices_dn)]
-            if dfs(demand_idx, demand, resources.devices,
-                    devices_used, devices_match, 'devices'):
+            if dfs(demand_idx, demand, resources.devices, 
+                    devices_used, devices_match,
+                    'devices', res):
                 devices_match_num += 1
         if devices_match_num != devices_dn:
-            return None
+            return False
         # workers part
         workers_dn = len(demands.workers)
         workers_an = len(resources.workers)
@@ -342,11 +357,12 @@ def bipartite_graph_match(demands, resources, match_type):
         workers_match = [-1 for x in range(workers_an)]
         for demand_idx, demand in enumerate(demands.workers):
             workers_used = [0 for x in range(workers_dn)]
-            if dfs(demand_idx, demand, resources.workers,
-                    workers_used, workers_match, 'workers'):
+            if dfs(demand_idx, demand, resources.workers, 
+                    workers_used, workers_match,
+                    'workers', res):
                 workers_match_num += 1
         if workers_match_num != workers_dn:
-            return None
+            return False
         # applications part
         applications_dn = len(demands.applications)
         applications_an = len(resources.applications)
@@ -354,33 +370,52 @@ def bipartite_graph_match(demands, resources, match_type):
         applications_match = [-1 for x in range(applications_an)]
         for demand_idx, demand in enumerate(demands.applications):
             applications_used = [0 for x in range(applications_dn)]
-            if dfs(demand_idx, demand, resources.applications,
-                    applications_used, applications_match, 'applications'):
+            if dfs(demand_idx, demand, resources.applications, 
+                    applications_used, applications_match,
+                    'applications', res):
                 applications_match_num += 1
         if applications_match_num != applications_dn:
-            return None
-        return [devices_match, workers_match, applications_match]
+            return False
+        res.update({demands.devices[di].id:resources.devices[ai].id 
+                    for ai, di in enumerate(devices_match)})
+        res.update({demands.workers[di].id:resources.workers[ai].id
+                    for ai, di in enumerate(workers_match)})
+        res.update({demands.applications[ai].id:resources.applications[ai].id
+                    for ai, di in enumerate(applications_match)})
+        return True
     elif match_type in ['cloudnodes', 'netnodes', 'edgeservers']:
-        #TODO
+        if demands.location != '' and demands.location != resources.location:
+            return False
+        if demands.cpu > resources.cpu:
+            return False
+        if demands.memory > resources.memory:
+            return False
+        if demands.store > resources.store:
+            return False
+        return True
     elif match_type in ['devices', 'workers', 'applications']:
-        #TODO
+        if demands.name != resources.name:
+            return False
+        return True
     else:
         raise Exception(f'error match type: {match_type}')
 
 def schedule(demands, resources):
-    cloudlayer = cloudlayer_match(
-            demands.cloudlayer, resources.cloudlayer)
-    networklayer = networklayer_match(
-            demands.networklayer, resources.networklayer)
-    endlayer = endlayer_match(
-            demands.endlayer, resources.endlayer)
-    if cloudlayer is None or \
-            networklayer is None or \
-            endlayer is None:
+    res = {}
+    cloudlayer = bipartite_graph_match(
+            demands.cloudlayer, resources.cloudlayer,
+            'cloudlayer', res)
+    networklayer = bipartite_graph_match(
+            demands.networklayer, resources.networklayer,
+            'networklayer', res)
+    endlayer = bipartite_graph_match(
+            demands.endlayer, resources.endlayer,
+            'endlayer', res)
+    if cloudlayer and networklayer and endlayer:
+        return res
+    else:
         print('can not schedule.')
         return None
-    return [cloudlayer, networklayer, endlayer]
-
 
 def respose(match):
     pass # return match
@@ -394,9 +429,9 @@ if __name__ == '__main__':
     with open('./demand.hrm') as f:
         jsonObj = json.loads(f.read())
         demands = receive(jsonObj)
-        print_proto(demands)
+        #  print_proto(demands)
     with open('./resource.prototxt') as f:
         resources = entity_pb2.Entity()
         text_format.Parse(f.read(), resources)
-        print_proto(resources)
+        #  print_proto(resources)
     print(schedule(demands, resources))

@@ -230,20 +230,6 @@ def queryResources(database):
         print(f"id: {did}, inroom: {inroom}, name: {name}, location: {location}")
 
 
-def fit(demands, resources):
-    if demands.type != resources.type:
-        raise Exception(f'demands.type: {demands.type} '
-                        f'!= resources.type: {resources.type}')
-    if demands.type in ['Devices', 'Workers', 'Applications']:
-        return demands.name == resources.name
-    elif demands.type in ['CloudNodes', 'EdgeServers']:
-        return demands.store <= resources.store \
-                and demands.ncpu <= resources.ncpu \
-                and demands.mem <= resources.mem
-    else:
-        return bipartite_graph_matching(demands, resources)
-
-
 def dfs(demand_idx, demand, resources, used, match, dfs_type, res):
     for resource_idx, resource in enumerate(resources):
         if bipartite_graph_match(demand, resource, dfs_type, res) and not used[resource_idx]:

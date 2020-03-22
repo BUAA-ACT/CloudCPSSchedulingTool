@@ -290,6 +290,11 @@ def bipartite_graph_match(demands, resources, match_type, res):
             return False
         res.update({demands.cloudnodes[di].id:resources.cloudnodes[ai].id
                 for ai, di in enumerate(match)})
+        container_match = {}
+        for ai, di in enumerate(match):
+            for container in demands.cloudnodes[di].containers:
+                container_match[container.id] = resources.cloudnodes[ai].id
+        res.update(container_match)
         return True
     elif match_type == 'networklayer':
         # netnodes part
@@ -322,6 +327,14 @@ def bipartite_graph_match(demands, resources, match_type, res):
                     for ai, di in enumerate(netnodes_match)})
         res.update({demands.edgeservers[di].id:resources.edgeservers[ai].id
                     for ai, di in enumerate(edgeservers_match)})
+        container_match = {}
+        for ai, di in enumerate(netnodes_match):
+            for container in demands.netnodes[di].containers:
+                container_match[container.id] = resources.netnodes[ai].id
+        for ai, di in enumerate(edgeservers_match):
+            for container in demands.edgeservers[di].containers:
+                container_match[container.id] = resources.edgeservers[ai].id
+        res.update(container_match)
         return True
     elif match_type == 'endlayer':
         dn = len(demands.rooms)
@@ -384,13 +397,18 @@ def bipartite_graph_match(demands, resources, match_type, res):
                     for ai, di in enumerate(applications_match)})
         return True
     elif match_type in ['cloudnodes', 'netnodes', 'edgeservers']:
-        if demands.location != '' and demands.location != resources.location:
+        demand_cpu = 0
+        demand_mem = 0
+        demand_sto = 0
+        for container in demands.containers:
+            demand_cpu += container.cpu
+            demand_mem += container.memory
+            demand_sto += container.store
+        if demand_cpu > resources.cpu:
             return False
-        if demands.cpu > resources.cpu:
+        if demand_mem > resources.memory:
             return False
-        if demands.memory > resources.memory:
-            return False
-        if demands.store > resources.store:
+        if demand_sto > resources.store:
             return False
         return True
     elif match_type in ['devices', 'workers', 'applications']:
@@ -405,17 +423,22 @@ def schedule(demands, resources):
     cloudlayer = bipartite_graph_match(
             demands.cloudlayer, resources.cloudlayer,
             'cloudlayer', res)
+    if not cloudlayer:
+        print('cloudlayer can not schedule.')
+        return None
     networklayer = bipartite_graph_match(
             demands.networklayer, resources.networklayer,
             'networklayer', res)
+    if not networklayer:
+        print('networklayer can not schedule.')
+        return None
     endlayer = bipartite_graph_match(
             demands.endlayer, resources.endlayer,
             'endlayer', res)
-    if cloudlayer and networklayer and endlayer:
-        return res
-    else:
-        print('can not schedule.')
+    if not endlayer:
+        print('endlayer can not schedule.')
         return None
+    return res
 
 def respose(match):
     pass # return match

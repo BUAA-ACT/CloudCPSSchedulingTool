@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=b'\n\x0c\x65ntity.proto\"\x8f\x01\n\x06\x45ntity\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x1f\n\ncloudlayer\x18\x02 \x02(\x0b\x32\x0b.CloudLayer\x12#\n\x0cnetworklayer\x18\x03 \x02(\x0b\x32\r.NetworkLayer\x12\x1b\n\x08\x65ndlayer\x18\x04 \x02(\x0b\x32\t.EndLayer\x12\x14\n\x05links\x18\x05 \x02(\x0b\x32\x05.Link\"&\n\x04Link\x12\x0e\n\x06source\x18\x01 \x02(\t\x12\x0e\n\x06target\x18\x02 \x02(\t\".\n\nCloudLayer\x12 \n\x0b\x64\x61tacenters\x18\x02 \x03(\x0b\x32\x0b.Datacenter\"X\n\nDatacenter\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x02(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x1e\n\ncloudnodes\x18\x04 \x03(\x0b\x32\n.CloudNode\"\x83\x01\n\tCloudNode\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x02(\t\x12\x10\n\x08location\x18\x03 \x02(\t\x12\x0b\n\x03\x63pu\x18\x04 \x01(\x05\x12\x0e\n\x06memory\x18\x05 \x01(\x05\x12\r\n\x05store\x18\x06 \x01(\x05\x12\x1e\n\ncontainers\x18\x07 \x03(\x0b\x32\n.Container\"Q\n\tContainer\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0b\n\x03\x63pu\x18\x02 \x02(\x05\x12\x0e\n\x06memory\x18\x03 \x02(\x05\x12\r\n\x05store\x18\x04 \x02(\x05\x12\n\n\x02id\x18\x05 \x02(\t\"K\n\x0cNetworkLayer\x12\x1a\n\x08netnodes\x18\x01 \x03(\x0b\x32\x08.NetNode\x12\x1f\n\nedgeserver\x18\x02 \x03(\x0b\x32\x0b.EdgeServer\"\x81\x01\n\x07NetNode\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x02(\t\x12\x10\n\x08location\x18\x03 \x02(\t\x12\x0b\n\x03\x63pu\x18\x04 \x01(\x05\x12\x0e\n\x06memory\x18\x05 \x01(\x05\x12\r\n\x05store\x18\x06 \x01(\x05\x12\x1e\n\ncontainers\x18\x07 \x03(\x0b\x32\n.Container\"\x84\x01\n\nEdgeServer\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x02(\t\x12\x10\n\x08location\x18\x03 \x02(\t\x12\x0b\n\x03\x63pu\x18\x04 \x01(\x05\x12\x0e\n\x06memory\x18\x05 \x01(\x05\x12\r\n\x05store\x18\x06 \x01(\x05\x12\x1e\n\ncontainers\x18\x07 \x03(\x0b\x32\n.Container\" \n\x08\x45ndLayer\x12\x14\n\x05rooms\x18\x01 \x03(\x0b\x32\x05.Room\"~\n\x04Room\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x02(\t\x12\x18\n\x07\x64\x65vices\x18\x03 \x03(\x0b\x32\x07.Device\x12\x18\n\x07workers\x18\x04 \x03(\x0b\x32\x07.Worker\x12\"\n\x0c\x61pplications\x18\x05 \x03(\x0b\x32\x0c.Application\"\"\n\x06\x44\x65vice\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\n\n\x02id\x18\x02 \x02(\t\"\"\n\x06Worker\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\n\n\x02id\x18\x02 \x02(\t\"\'\n\x0b\x41pplication\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\n\n\x02id\x18\x02 \x02(\t'
+  serialized_pb=b'\n\x0c\x65ntity.proto\"\x8f\x01\n\x06\x45ntity\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x1f\n\ncloudlayer\x18\x02 \x02(\x0b\x32\x0b.CloudLayer\x12#\n\x0cnetworklayer\x18\x03 \x02(\x0b\x32\r.NetworkLayer\x12\x1b\n\x08\x65ndlayer\x18\x04 \x02(\x0b\x32\t.EndLayer\x12\x14\n\x05links\x18\x05 \x02(\x0b\x32\x05.Link\"&\n\x04Link\x12\x0e\n\x06source\x18\x01 \x02(\t\x12\x0e\n\x06target\x18\x02 \x02(\t\".\n\nCloudLayer\x12 \n\x0b\x64\x61tacenters\x18\x02 \x03(\x0b\x32\x0b.Datacenter\"X\n\nDatacenter\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x02(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x1e\n\ncloudnodes\x18\x04 \x03(\x0b\x32\n.CloudNode\"\x83\x01\n\tCloudNode\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x02(\t\x12\x10\n\x08location\x18\x03 \x01(\t\x12\x0b\n\x03\x63pu\x18\x04 \x01(\x05\x12\x0e\n\x06memory\x18\x05 \x01(\x05\x12\r\n\x05store\x18\x06 \x01(\x05\x12\x1e\n\ncontainers\x18\x07 \x03(\x0b\x32\n.Container\"Q\n\tContainer\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0b\n\x03\x63pu\x18\x02 \x02(\x05\x12\x0e\n\x06memory\x18\x03 \x02(\x05\x12\r\n\x05store\x18\x04 \x02(\x05\x12\n\n\x02id\x18\x05 \x02(\t\"L\n\x0cNetworkLayer\x12\x1a\n\x08netnodes\x18\x01 \x03(\x0b\x32\x08.NetNode\x12 \n\x0b\x65\x64geservers\x18\x02 \x03(\x0b\x32\x0b.EdgeServer\"\x81\x01\n\x07NetNode\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x02(\t\x12\x10\n\x08location\x18\x03 \x01(\t\x12\x0b\n\x03\x63pu\x18\x04 \x01(\x05\x12\x0e\n\x06memory\x18\x05 \x01(\x05\x12\r\n\x05store\x18\x06 \x01(\x05\x12\x1e\n\ncontainers\x18\x07 \x03(\x0b\x32\n.Container\"\x84\x01\n\nEdgeServer\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x02(\t\x12\x10\n\x08location\x18\x03 \x01(\t\x12\x0b\n\x03\x63pu\x18\x04 \x01(\x05\x12\x0e\n\x06memory\x18\x05 \x01(\x05\x12\r\n\x05store\x18\x06 \x01(\x05\x12\x1e\n\ncontainers\x18\x07 \x03(\x0b\x32\n.Container\" \n\x08\x45ndLayer\x12\x14\n\x05rooms\x18\x01 \x03(\x0b\x32\x05.Room\"~\n\x04Room\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x02(\t\x12\x18\n\x07\x64\x65vices\x18\x03 \x03(\x0b\x32\x07.Device\x12\x18\n\x07workers\x18\x04 \x03(\x0b\x32\x07.Worker\x12\"\n\x0c\x61pplications\x18\x05 \x03(\x0b\x32\x0c.Application\"\"\n\x06\x44\x65vice\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\n\n\x02id\x18\x02 \x02(\t\"\"\n\x06Worker\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\n\n\x02id\x18\x02 \x02(\t\"\'\n\x0b\x41pplication\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\n\n\x02id\x18\x02 \x02(\t'
 )
 
 
@@ -227,7 +227,7 @@ _CLOUDNODE = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='location', full_name='CloudNode.location', index=2,
-      number=3, type=9, cpp_type=9, label=2,
+      number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -351,7 +351,7 @@ _NETWORKLAYER = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='edgeserver', full_name='NetworkLayer.edgeserver', index=1,
+      name='edgeservers', full_name='NetworkLayer.edgeservers', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -370,7 +370,7 @@ _NETWORKLAYER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=557,
-  serialized_end=632,
+  serialized_end=633,
 )
 
 
@@ -397,7 +397,7 @@ _NETNODE = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='location', full_name='NetNode.location', index=2,
-      number=3, type=9, cpp_type=9, label=2,
+      number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -442,8 +442,8 @@ _NETNODE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=635,
-  serialized_end=764,
+  serialized_start=636,
+  serialized_end=765,
 )
 
 
@@ -470,7 +470,7 @@ _EDGESERVER = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='location', full_name='EdgeServer.location', index=2,
-      number=3, type=9, cpp_type=9, label=2,
+      number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -515,8 +515,8 @@ _EDGESERVER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=767,
-  serialized_end=899,
+  serialized_start=768,
+  serialized_end=900,
 )
 
 
@@ -546,8 +546,8 @@ _ENDLAYER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=901,
-  serialized_end=933,
+  serialized_start=902,
+  serialized_end=934,
 )
 
 
@@ -605,8 +605,8 @@ _ROOM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=935,
-  serialized_end=1061,
+  serialized_start=936,
+  serialized_end=1062,
 )
 
 
@@ -643,8 +643,8 @@ _DEVICE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1063,
-  serialized_end=1097,
+  serialized_start=1064,
+  serialized_end=1098,
 )
 
 
@@ -681,8 +681,8 @@ _WORKER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1099,
-  serialized_end=1133,
+  serialized_start=1100,
+  serialized_end=1134,
 )
 
 
@@ -719,8 +719,8 @@ _APPLICATION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1135,
-  serialized_end=1174,
+  serialized_start=1136,
+  serialized_end=1175,
 )
 
 _ENTITY.fields_by_name['cloudlayer'].message_type = _CLOUDLAYER
@@ -731,7 +731,7 @@ _CLOUDLAYER.fields_by_name['datacenters'].message_type = _DATACENTER
 _DATACENTER.fields_by_name['cloudnodes'].message_type = _CLOUDNODE
 _CLOUDNODE.fields_by_name['containers'].message_type = _CONTAINER
 _NETWORKLAYER.fields_by_name['netnodes'].message_type = _NETNODE
-_NETWORKLAYER.fields_by_name['edgeserver'].message_type = _EDGESERVER
+_NETWORKLAYER.fields_by_name['edgeservers'].message_type = _EDGESERVER
 _NETNODE.fields_by_name['containers'].message_type = _CONTAINER
 _EDGESERVER.fields_by_name['containers'].message_type = _CONTAINER
 _ENDLAYER.fields_by_name['rooms'].message_type = _ROOM

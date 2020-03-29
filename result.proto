@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+message Result {
+  required string appname = 1;
+  repeated Match matchs = 2;
+}
+
+message Match {
+  required string demandid = 1;
+  required string resourceid = 2;
+}

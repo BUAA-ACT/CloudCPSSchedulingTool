@@ -1,10 +1,10 @@
 {
-  "Name": "单机计算多机计算模型",
+  "Name": "testApp",
   "EndLayer": {
     "Devices": [
       {
         "DeviceID": "15",
-        "Name": "风扇"
+        "Name": "xiaomi.wifispeaker.lx05"
       }
     ],
     "Rooms": [
@@ -13,11 +13,11 @@
         "Devices": [
           {
             "DeviceID": "12",
-            "Name": "灯"
+            "Name": "light"
           },
           {
             "DeviceID": "13",
-            "Name": "壶"
+            "Name": "pulg"
           }
         ]
       }
@@ -46,12 +46,6 @@
     ]
   },
   "NetworkLayer": {
-    "NetNodes": [
-      {
-        "NetNodeID": "8",
-        "Location": "小作坊"
-      }
-    ]
   },
   "Links": [
     {

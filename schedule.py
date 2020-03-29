@@ -4,6 +4,7 @@
 # Create time: 2020-03-14
 import json
 import entity_pb2
+import result_pb2
 from google.protobuf import text_format
 import database
 
@@ -11,7 +12,7 @@ def parse_json_to_entity(jsonObj, entype):
 
     def parse_App(jsonObj):
         entity = entity_pb2.Entity()
-        entity.name = 'demand'
+        entity.name = jsonObj.get('Name')
         for item in ['CloudLayer', 'NetworkLayer', 'EndLayer']:
             if item not in jsonObj:
                 raise Exception(f'expect {item}, but not found.')
@@ -71,6 +72,10 @@ def parse_json_to_entity(jsonObj, entype):
 
     def parse_NetworkLayer(jsonObj):
         entity = entity_pb2.NetworkLayer()
+        
+        # 目前没有 networklayer 资源
+        return entity
+        
         for item in ['NetNodes', 'EdgeServers']:
             if item not in jsonObj:
                 if item == 'EdgeServers':
@@ -207,35 +212,98 @@ def receive(jsonObj):
 
 
 def queryResources(database):
+    '''
+    with open('./resource.prototxt') as f:
+        resources = entity_pb2.Entity()
+        text_format.Parse(f.read(), resources)
+    return resources
+    '''
     entity = entity_pb2.Entity()
     entity.name = 'resources'
+    
+    cloudlayer = entity_pb2.CloudLayer()
+    datacenters_dict = {}
     servers = database.queryNewestItems('serverinfo',
-            samelabel='id', timelabel='time')
+                                        timelabel='time')
     for server in servers:
-        [sid, name, ip, cpuUsage, diskIORead, diskIOWrite,
+        [sid, name, ip, cpuUnusage, diskIORead, diskIOWrite,
                 diskUsed, memoryUsed, networkUploadRate,
-                networkDownloadRate, time] = server
-        print(f"id: %d, cpuUsage: {cpuUsage}" % sid)
-    containers = database.queryNewestItems('dockerinfo',
-            samelabel='dockerId', timelabel='time')
+                networkDownloadRate, time, cpuNum, dataCenter,
+                memoryAvailable, diskAvailable] = server
+        cpuUsage = 1 - cpuUnusage
+        print(f"id: %d, " % sid + \
+              f"name: {name}, " + \
+              f"cpuNum: {cpuNum * (1 - cpuUsage)}, " + \
+              f"memoryAvailable: {memoryAvailable}, " + \
+              f"diskAvailable: {diskAvailable}")
+        cloudnode = entity_pb2.CloudNode()
+        cloudnode.id = '%d' % sid
+        cloudnode.location = name
+        cloudnode.cpu = cpuNum * (1 - cpuUsage)
+        cloudnode.memory = memoryAvailable
+        cloudnode.store = diskAvailable
+        if dataCenter not in datacenters_dict:
+            datacenters_dict[dataCenter] = entity_pb2.Datacenter()
+            datacenters_dict[dataCenter].location = dataCenter
+        datacenters_dict[dataCenter].cloudnodes.append(cloudnode)
+    for location, datacenter in datacenters_dict.items():
+        cloudlayer.datacenters.append(datacenter)
+    entity.cloudlayer.MergeFrom(cloudlayer)
+
+    '''
+    containers = database.queryNewestItems("dockerinfo",
+                                           timelabel='time')
     for container in containers:
         [sid, name, dockerid, cpuUsage, memUsage,
                 diskIORead, diskIOWrite, memoryUsed,
-                networkIORead, networkIOWrite, time] = container
-        print(f'id: {dockerid}')
-    devices = database.queryItems('deviceinfo', 'inroom="True"')
+                networkIORead, networkIOWrite, time,
+                cpuMem, memoryAvailable, diskAvailable] = container
+        print(f"id: {dockerid}, " + \
+              f"serverid: %d, " % sid + \
+              f"name: {name}, " + \
+              f"cpuNum: {cpuNum * (1 - cpuUsage)}, " + \
+              f"memoryAvailable: {memoryAvailable}, " + \
+              f"diskAvailable: {diskAvailable}")
+    '''
+
+    networklayer = entity_pb2.NetworkLayer()
+    entity.networklayer.MergeFrom(networklayer) # 暂时没有networklayer
+
+    endlayer = entity_pb2.EndLayer()
+    rooms_dict = {}
+    devices = database.queryItems('deviceinfo',
+                                  'inroom="True"')
     for device in devices:
         [did, localip, inroom, token, dtype, model,
                 name, data, location, timestamp] = device
-        print(f"id: {did}, inroom: {inroom}, name: {name}, location: {location}")
+        print(f"id: {did}, " + \
+              f"inroom: {inroom}, " + \
+              f"name: {name}, " + \
+              f"location: {location}")
+        if inroom != "True":
+            continue
+        device = entity_pb2.Device()
+        device.name = name
+        device.id = did
+        if location not in rooms_dict:
+            rooms_dict[location] = entity_pb2.Room()
+            rooms_dict[location].location = location
+        rooms_dict[location].devices.append(device)
+    for location, room in rooms_dict.items():
+        endlayer.rooms.append(room)
+    entity.endlayer.MergeFrom(endlayer)
+
+    return entity
 
 
 def dfs(demand_idx, demand, resources, used, match, dfs_type, res):
     for resource_idx, resource in enumerate(resources):
-        if bipartite_graph_match(demand, resource, dfs_type, res) and not used[resource_idx]:
+        if bipartite_graph_match(demand, resource, dfs_type, res) \
+                and not used[resource_idx]:
             used[resource_idx] = True
             if match[resource_idx] == -1 or \
-                    dfs(match[resource_idx], demand, resources, used, match, dfs_type):
+                    dfs(match[resource_idx], demand, resources,
+                            used, match, dfs_type, res):
                 match[resource_idx] = demand_idx
                 return True
     return False
@@ -248,7 +316,7 @@ def bipartite_graph_match(demands, resources, match_type, res):
         match_num = 0
         match = [-1 for x in range(an)]
         for demand_idx, demand in enumerate(demands.datacenters):
-            used = [0 for x in range(dn)]
+            used = [0 for x in range(an)]
             if dfs(demand_idx, demand, resources.datacenters, 
                     used, match, 'datacenters', res):
                 match_num += 1
@@ -261,7 +329,7 @@ def bipartite_graph_match(demands, resources, match_type, res):
         match_num = 0
         match = [-1 for x in range(an)]
         for demand_idx, demand in enumerate(demands.cloudnodes):
-            used = [0 for x in range(dn)]
+            used = [0 for x in range(an)]
             if dfs(demand_idx, demand, resources.cloudnodes, 
                     used, match, 'cloudnodes', res):
                 match_num += 1
@@ -282,7 +350,7 @@ def bipartite_graph_match(demands, resources, match_type, res):
         netnodes_match_num = 0
         netnodes_match = [-1 for x in range(netnodes_an)]
         for demand_idx, demand in enumerate(demands.netnodes):
-            netnodes_used = [0 for x in range(netnodes_dn)]
+            netnodes_used = [0 for x in range(netnodes_an)]
             if dfs(demand_idx, demand, resources.netnodes, 
                     netnodes_used, netnodes_match,
                     'netnodes', res):
@@ -295,7 +363,7 @@ def bipartite_graph_match(demands, resources, match_type, res):
         edgeservers_match_num = 0
         edgeservers_match = [-1 for x in range(edgeservers_an)]
         for demand_idx, demand in enumerate(demands.edgeservers):
-            edgeservers_used = [0 for x in range(edgeservers_dn)]
+            edgeservers_used = [0 for x in range(edgeservers_an)]
             if dfs(demand_idx, demand, resources.edgeservers, 
                     edgeservers_used, edgeservers_match,
                     'edgeservers', res):
@@ -321,7 +389,7 @@ def bipartite_graph_match(demands, resources, match_type, res):
         match_num = 0
         match = [-1 for x in range(an)]
         for demand_idx, demand in enumerate(demands.rooms):
-            used = [0 for x in range(dn)]
+            used = [0 for x in range(an)]
             if dfs(demand_idx, demand, resources.rooms,
                     used, match, 'rooms', res):
                 match_num += 1
@@ -335,7 +403,7 @@ def bipartite_graph_match(demands, resources, match_type, res):
         devices_match_num = 0
         devices_match = [-1 for x in range(devices_an)]
         for demand_idx, demand in enumerate(demands.devices):
-            devices_used = [0 for x in range(devices_dn)]
+            devices_used = [0 for x in range(devices_an)]
             if dfs(demand_idx, demand, resources.devices, 
                     devices_used, devices_match,
                     'devices', res):
@@ -348,7 +416,7 @@ def bipartite_graph_match(demands, resources, match_type, res):
         workers_match_num = 0
         workers_match = [-1 for x in range(workers_an)]
         for demand_idx, demand in enumerate(demands.workers):
-            workers_used = [0 for x in range(workers_dn)]
+            workers_used = [0 for x in range(workers_an)]
             if dfs(demand_idx, demand, resources.workers, 
                     workers_used, workers_match,
                     'workers', res):
@@ -361,7 +429,7 @@ def bipartite_graph_match(demands, resources, match_type, res):
         applications_match_num = 0
         applications_match = [-1 for x in range(applications_an)]
         for demand_idx, demand in enumerate(demands.applications):
-            applications_used = [0 for x in range(applications_dn)]
+            applications_used = [0 for x in range(applications_an)]
             if dfs(demand_idx, demand, resources.applications, 
                     applications_used, applications_match,
                     'applications', res):
@@ -397,6 +465,7 @@ def bipartite_graph_match(demands, resources, match_type, res):
     else:
         raise Exception(f'error match type: {match_type}')
 
+
 def schedule(demands, resources):
     res = {}
     cloudlayer = bipartite_graph_match(
@@ -417,27 +486,47 @@ def schedule(demands, resources):
     if not endlayer:
         print('endlayer can not schedule.')
         return None
-    return res
+    
+    result = result_pb2.Result()
+    result.appname = demands.name
+    for did, sid in res.items():
+        mth = result_pb2.Match()
+        mth.demandid = did
+        mth.resourceid = sid
+        result.matchs.append(mth)
+    return result
 
-def respose(match):
-    pass # return match
+
+def writeToTable(database, table, result):
+    for match in result.matchs:
+        params = {'appName': result.appname,
+                  'demandid': match.demandid,
+                  'resourceid': match.resourceid}
+        database.insert(table, params)
 
 
 def print_proto(proto):
     text = text_format.MessageToString(proto, as_utf8=True)
     print(text)
 
+
+def save_proto(proto, filename):
+    with open(filename, 'w') as f:
+        f.write(text_format.MessageToString(proto, as_utf8=True))
+
+
 if __name__ == '__main__':
-    #  database_manager = database.DatabaseManager('39.104.154.79',
-            #  'wangch', '20191104wc', 'root', '20191104', 'node_infos')
-    #  queryResources(database_manager)
-    #  database_manager.__del__()
+    database_manager = database.DatabaseManager('39.104.154.79',
+            'wangch', '20191104wc', 'root', '20191104', 'node_infos')
     with open('./demand.hrm') as f:
         jsonObj = json.loads(f.read())
         demands = receive(jsonObj)
-        #  print_proto(demands)
-    with open('./resource.prototxt') as f:
-        resources = entity_pb2.Entity()
-        text_format.Parse(f.read(), resources)
-        #  print_proto(resources)
-    print(schedule(demands, resources))
+    resources = queryResources(database_manager)
+    save_proto(demands, 'demands.prototxt')
+    save_proto(resources, 'resources.prototxt')
+    print_proto(demands)
+    print_proto(resources)
+    result = schedule(demands, resources)
+    print_proto(result)
+    writeToTable(database_manager, 'matchtable', result)
+    database_manager.__del__()

@@ -28,17 +28,17 @@ message CloudNode {
   optional string name = 1;
   required string id = 2; // 对需求来说是有向图的ID，对资源来说是数据库ID
   optional string location = 3;
-  optional int32 cpu = 4; // 需求端不需要在CloudNone处给出资源信息（在Container给出），资源端要给出
-  optional int32 memory = 5;
-  optional int32 store = 6;
+  optional double cpu = 4; // 需求端不需要在CloudNone处给出资源信息（在Container给出），资源端要给出
+  optional double memory = 5;
+  optional double store = 6;
   repeated Container containers = 7;
 }
 
 message Container {
   optional string name = 1;
-  required int32 cpu = 2;
-  required int32 memory = 3;
-  required int32 store = 4;
+  required double cpu = 2;
+  required double memory = 3;
+  required double store = 4;
   required string id = 5;
 }
 
@@ -51,9 +51,9 @@ message NetNode {
   optional string name = 1;
   required string id = 2;
   optional string location = 3;
-  optional int32 cpu = 4;
-  optional int32 memory = 5;
-  optional int32 store = 6;
+  optional double cpu = 4;
+  optional double memory = 5;
+  optional double store = 6;
   repeated Container containers = 7;
 }
 
@@ -61,9 +61,9 @@ message EdgeServer {
   optional string name = 1;
   required string id = 2;
   optional string location = 3;
-  optional int32 cpu = 4;
-  optional int32 memory = 5;
-  optional int32 store = 6;
+  optional double cpu = 4;
+  optional double memory = 5;
+  optional double store = 6;
   repeated Container containers = 7;
 }
 

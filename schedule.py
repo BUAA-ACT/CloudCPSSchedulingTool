@@ -3,10 +3,13 @@
 # Python release: 3.7.0
 # Create time: 2020-03-14
 import json
+from google.protobuf import text_format
+
 import entity_pb2
 import result_pb2
-from google.protobuf import text_format
 import database
+import config
+
 
 def parse_json_to_entity(jsonObj, entype):
 
@@ -516,8 +519,10 @@ def save_proto(proto, filename):
 
 
 if __name__ == '__main__':
-    database_manager = database.DatabaseManager('39.104.154.79',
-            'wangch', '20191104wc', 'root', '20191104', 'node_infos')
+    database_manager = database.DatabaseManager(
+            config.DATABASE.remote_ip, config.DATABASE.remote_usr,
+            config.DATABASE.remote_pwd, config.DATABASE.database_usr,
+            config.DATABASE.database_pwd, config.DATABASE.database_name)
     with open('./demand.hrm') as f:
         jsonObj = json.loads(f.read())
         demands = receive(jsonObj)

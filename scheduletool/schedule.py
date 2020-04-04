@@ -467,7 +467,7 @@ def bipartite_graph_match(demands, resources, match_type, res):
         raise Exception(f'error match type: {match_type}')
 
 
-def schedule(demands, resources):
+def schedule(demands, resources, rtype='json'):
     res = {}
     cloudlayer = bipartite_graph_match(
             demands.cloudlayer, resources.cloudlayer,
@@ -488,14 +488,19 @@ def schedule(demands, resources):
         print('endlayer can not schedule.')
         return None
     
-    result = result_pb2.Result()
-    result.appname = demands.name
-    for did, sid in res.items():
-        mth = result_pb2.Match()
-        mth.demandid = did
-        mth.resourceid = sid
-        result.matchs.append(mth)
-    return result
+    if rtype == 'json':
+        return json.dumps(res)
+    elif rtype == 'proto':
+        result = result_pb2.Result()
+        result.appname = demands.name
+        for did, sid in res.items():
+            mth = result_pb2.Match()
+            mth.demandid = did
+            mth.resourceid = sid
+            result.matchs.append(mth)
+        return result
+    else:
+        raise Exception('error rtype: {}'.format(rtype))
 
 
 def writeToTable(database, table, result):
@@ -530,7 +535,7 @@ if __name__ == '__main__':
     save_proto(resources, 'resources.prototxt')
     print_proto(demands)
     print_proto(resources)
-    result = schedule(demands, resources)
+    result = schedule(demands, resources, rtype='proto')
     print_proto(result)
     writeToTable(database_manager, 'matchtable', result)
     database_manager.__del__()

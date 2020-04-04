@@ -53,7 +53,7 @@ def parse_json_to_entity(jsonObj, entype):
         entity = entity_pb2.CloudNode()
         entity.id = jsonObj.get('CloudNodeID')
         #  entity.name = jsonObj.get('Name')
-        entity.location = jsonObj.get('Location')
+        #  entity.location = jsonObj.get('Location')
         for item in ['Containers']:
             if item not in jsonObj:
                 raise Exceptio(f'expect {item}, but not found.')
@@ -66,9 +66,18 @@ def parse_json_to_entity(jsonObj, entype):
         entity = entity_pb2.Container()
         entity.id = jsonObj.get('ContainerID')
         #  entity.name = jsonObj.get('Name')
-        entity.cpu = int(jsonObj.get('CpuNumber'))
-        entity.memory = int(jsonObj.get('Memory'))
-        entity.store = int(jsonObj.get('Store'))
+        cpu = jsonObj.get('CpuNumber')
+        if cpu is None:
+            print('error: Container no cpu')
+        entity.cpu = float(cpu) if cpu is not None else 1
+        memory = jsonObj.get('Memory')
+        if memory is None:
+            print('error: Container no memory')
+        entity.memory = float(memory) if memory is not None else 1024
+        store = jsonObj.get('Store')
+        if store is None:
+            print('error: Container no store')
+        entity.store = float(store) if store is not None else 1024
         return entity
 
     def parse_NetworkLayer(jsonObj):
@@ -132,7 +141,7 @@ def parse_json_to_entity(jsonObj, entype):
                     if general_room is None:
                         general_room = entity_pb2.Room()
                         general_room.name = 'GeneralRoom'
-                        general_room.location = 'Logical'
+                        general_room.location = 'null'
                     if item == 'Devices':
                         general_room.devices.append(parse_json_to_entity(
                             subJsonObj, item))
@@ -151,7 +160,8 @@ def parse_json_to_entity(jsonObj, entype):
     def parse_Rooms(jsonObj):
         entity = entity_pb2.Room()
         #  entity.name = jsonObj.get('Name')
-        entity.location = jsonObj.get('Location')
+        location = jsonObj.get('Location')
+        entity.location = location if location is not None else 'null'
         items = ['Devices', 'Workers', 'Applications']
         empty = True
         for item in items:
@@ -398,6 +408,9 @@ def bipartite_graph_match(demands, resources, match_type, res):
             return False
         return True
     elif match_type == 'rooms':
+        if demands.location != 'null' and \
+                demands.location != resources.location:
+            return False
         # devices part
         devices_dn = len(demands.devices)
         devices_an = len(resources.devices)

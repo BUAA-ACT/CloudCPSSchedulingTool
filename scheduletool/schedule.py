@@ -8,8 +8,6 @@ from google.protobuf import text_format
 import entity_pb2
 import result_pb2
 import database
-import config
-
 
 def parse_json_to_entity(jsonObj, entype):
 
@@ -519,6 +517,7 @@ def save_proto(proto, filename):
 
 
 if __name__ == '__main__':
+    raise Exception('You can not run this script directly.')
     database_manager = database.DatabaseManager(
             config.DATABASE.remote_ip, config.DATABASE.remote_usr,
             config.DATABASE.remote_pwd, config.DATABASE.database_usr,

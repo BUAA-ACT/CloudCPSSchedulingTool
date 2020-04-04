@@ -5,10 +5,6 @@
 import json
 from google.protobuf import text_format
 
-import entity_pb2
-import result_pb2
-import database
-
 def parse_json_to_entity(jsonObj, entype):
 
     def parse_App(jsonObj):

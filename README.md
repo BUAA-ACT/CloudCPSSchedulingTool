@@ -5,7 +5,15 @@
 @王旭
 
 4. 系统工作
-（3）调度工具
+
+  （3）调度工具
+
+## 使用
+
+```shell
+python setup.py bdist_wheel
+pip install -U dist/scheduling_tool*
+```
 
 ## 思路
 

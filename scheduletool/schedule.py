@@ -382,14 +382,18 @@ def bipartite_graph_match(demands, resources, match_type, res):
         if edgeservers_match_num != edgeservers_dn:
             return False
         res.update({demands.netnodes[di].id:resources.netnodes[ai].id 
-                    for ai, di in enumerate(netnodes_match)})
+                    for ai, di in enumerate(netnodes_match) if di != -1})
         res.update({demands.edgeservers[di].id:resources.edgeservers[ai].id
-                    for ai, di in enumerate(edgeservers_match)})
+                    for ai, di in enumerate(edgeservers_match) if di != -1})
         container_match = {}
         for ai, di in enumerate(netnodes_match):
+            if di == -1:
+                continue
             for container in demands.netnodes[di].containers:
                 container_match[container.id] = resources.netnodes[ai].id
         for ai, di in enumerate(edgeservers_match):
+            if di == -1:
+                continue
             for container in demands.edgeservers[di].containers:
                 container_match[container.id] = resources.edgeservers[ai].id
         res.update(container_match)
@@ -451,11 +455,11 @@ def bipartite_graph_match(demands, resources, match_type, res):
         if applications_match_num != applications_dn:
             return False
         res.update({demands.devices[di].id:resources.devices[ai].id 
-                    for ai, di in enumerate(devices_match)})
+                    for ai, di in enumerate(devices_match) if di != -1})
         res.update({demands.workers[di].id:resources.workers[ai].id
-                    for ai, di in enumerate(workers_match)})
+                    for ai, di in enumerate(workers_match) if di != -1})
         res.update({demands.applications[ai].id:resources.applications[ai].id
-                    for ai, di in enumerate(applications_match)})
+                    for ai, di in enumerate(applications_match) if di != -1})
         return True
     elif match_type in ['cloudnodes', 'netnodes', 'edgeservers']:
         demand_cpu = 0

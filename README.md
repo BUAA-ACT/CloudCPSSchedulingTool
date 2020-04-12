@@ -46,19 +46,19 @@ message CloudNode {
 }
 ```
 
-当需求端与资源端的`CloudLayer`进行匹配时，将`DataCenter`实体视作抽象节点，调度问题被转化为传统二分图匹配问题。下图中$D_1, D_2, D_3$ 表示需求描述`CloudLayer`中的所有`DataCenter`，$d_1, d_2, d_3$表示资源描述`CloudLayer`中所有的`DataCenter`。
+当需求端与资源端的`CloudLayer`进行匹配时，将`DataCenter`实体视作抽象节点，调度问题被转化为传统二分图匹配问题。下图中![](http://latex.codecogs.com/gif.latex?\\D_1, D_2, D_3) 表示需求描述`CloudLayer`中的所有`DataCenter`，![](http://latex.codecogs.com/gif.latex?\\d_1, d_2, d_3) 表示资源描述`CloudLayer`中所有的`DataCenter`。
 
 <img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdraorqt0rj30xe0u0who.jpg" alt="image-20200412210154856" style="zoom:33%;" />
 
-此时，若$D_1$ 与$d_1$ 匹配，则需要满足$D_1$ 与 $d_1$ 中的`CloudNode`能够匹配。
+此时，若![](http://latex.codecogs.com/gif.latex?\\D_1) 与![](http://latex.codecogs.com/gif.latex?\\d_1) 匹配，则需要满足![](http://latex.codecogs.com/gif.latex?\\D_1) 与 ![](http://latex.codecogs.com/gif.latex?\\d_1) 中的`CloudNode`能够匹配。
 
-我们继续将`CloudNode`实体视作抽象节点进行二分图匹配。如下图所示，$C_1, C_2$ 为`DataCenter`$D_1$ 中的`CloudNode`，$c_1, c_2, c_3$ 为`DataCenter` $d_1$ 中的`CloudNode`。
+我们继续将`CloudNode`实体视作抽象节点进行二分图匹配。如下图所示，![](http://latex.codecogs.com/gif.latex?\\C_1, C_2) 为`DataCenter`![](http://latex.codecogs.com/gif.latex?\\D_1) 中的`CloudNode`，![](http://latex.codecogs.com/gif.latex?\\c_1, c_2, c_3) 为`DataCenter` ![](http://latex.codecogs.com/gif.latex?\\d_1) 中的`CloudNode`。
 
-<img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdraopjrwqj315w0u0gpc.jpg" alt="image-20200412210414060" style="zoom:33%;" />
+<img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdraykifwqj315w0u0gpc.jpg" alt="Snip20200412_9" style="zoom:33%;" />
 
-如果能需求端`CloudNode` $C_x$ 上的所有`Container`都能被部署到资源端`CloudNode` $c_y$ 上，则称作$C_x$ 与 $c_y$ 匹配。
+如果能需求端`CloudNode` ![](http://latex.codecogs.com/gif.latex?\\C_x) 上的所有`Container`都能被部署到资源端`CloudNode` ![](http://latex.codecogs.com/gif.latex?\\c_y)上，则称作![](http://latex.codecogs.com/gif.latex?\\C_x) 与 ![](http://latex.codecogs.com/gif.latex?\\c_y) 匹配。
 
-进一步，只有当需求端`DataCener` $D_x$ 中所有`CloudNode`都能被部署到资源端`DataCenter` $d_y$ 的`CloudNode`上，即`CloudNode`的最大匹配为需求端的`CloudNode`数时，才称作$D_1$ 与 $d_1$ 匹配。
+进一步，只有当需求端`DataCener` ![](http://latex.codecogs.com/gif.latex?\\D_x) 中所有`CloudNode`都能被部署到资源端`DataCenter` ![](http://latex.codecogs.com/gif.latex?\\d_y)的`CloudNode`上，即`CloudNode`的最大匹配为需求端的`CloudNode`数时，才称作![](http://latex.codecogs.com/gif.latex?\\D_1)与 ![](http://latex.codecogs.com/gif.latex?\\d_1) 匹配。
 
 而只有当`DataCenter`的最大匹配为需求端的`DataCenter`数，才视作`CloudLayer`调度成功。
 

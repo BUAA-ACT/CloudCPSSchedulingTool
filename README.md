@@ -48,13 +48,13 @@ message CloudNode {
 
 当需求端与资源端的`CloudLayer`进行匹配时，将`DataCenter`实体视作抽象节点，调度问题被转化为传统二分图匹配问题。下图中<img src="http://latex.codecogs.com/gif.latex?D_1,D_2,D_3" /> 表示需求描述`CloudLayer`中的所有`DataCenter`，<img src="http://latex.codecogs.com/gif.latex?d_1,d_2,d_3" /> 表示资源描述`CloudLayer`中所有的`DataCenter`。
 
-<img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdraorqt0rj30xe0u0who.jpg" alt="image-20200412210154856" style="zoom:33%;" />
+<img src="img/Snip20200412_8.png" alt="image-20200412210154856" style="zoom:33%;" />
 
 此时，若<img src="http://latex.codecogs.com/gif.latex?D_1" /> 与<img src="http://latex.codecogs.com/gif.latex?d_1" /> 匹配，则需要满足<img src="http://latex.codecogs.com/gif.latex?D_1" /> 与 <img src="http://latex.codecogs.com/gif.latex?d_1" /> 中的`CloudNode`能够匹配。
 
 我们继续将`CloudNode`实体视作抽象节点进行二分图匹配。如下图所示，<img src="http://latex.codecogs.com/gif.latex?C_1,C_2" /> 为`DataCenter`<img src="http://latex.codecogs.com/gif.latex?D_1" /> 中的`CloudNode`，<img src="http://latex.codecogs.com/gif.latex?c_1,c_2,c_3" /> 为`DataCenter` <img src="http://latex.codecogs.com/gif.latex?d_1" />中的`CloudNode`。
 
-<img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdraykifwqj315w0u0gpc.jpg" alt="Snip20200412_9" style="zoom:33%;" />
+<img src="img/Snip20200412_9.png" alt="Snip20200412_9" style="zoom:33%;" />
 
 如果能需求端`CloudNode` <img src="http://latex.codecogs.com/gif.latex?C_x" /> 上的所有`Container`都能被部署到资源端`CloudNode` <img src="http://latex.codecogs.com/gif.latex?c_y" />上，则称作<img src="http://latex.codecogs.com/gif.latex?C_x" /> 与 <img src="http://latex.codecogs.com/gif.latex?c_y" /> 匹配。
 

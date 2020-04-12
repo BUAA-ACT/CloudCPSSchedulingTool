@@ -6,6 +6,6 @@ message Result {
 }
 
 message Match {
-  required string demandid = 1;
-  required string resourceid = 2;
+  required string demand = 1;
+  required string resource = 2;
 }

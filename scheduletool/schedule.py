@@ -501,9 +501,143 @@ def schedule(demands, resources, rtype='json'):
         print('endlayer can not schedule.')
         return None
     
+    return pack(demands, resources, res, rtype)
+
+
+def search_for_type(entity, eid):
+
+    def lookup_App(entity, eid):
+        res = lookup_CloudLayer(entity.cloudlayer, eid)
+        if res:
+            return res
+        res = lookup_NetworkLayer(entity.networklayer, eid)
+        if res:
+            return res
+        res = lookup_EndLayer(entity.endlayer, eid)
+        return res
+
+    def lookup_CloudLayer(entity, eid):
+        res = None
+        for d in entity.datacenters:
+            res = lookup_Datacenter(d, eid)
+            if res:
+                break
+        return res
+
+    def lookup_Datacenter(entity, eid):
+        if eid == entity.id:
+            return 'Datacenter'
+        res = None
+        for c in entity.cloudnodes:
+            res = lookup_CloudNode(c, eid)
+            if res:
+                break
+        return res
+
+    def lookup_CloudNode(entity, eid):
+        if eid == entity.id:
+            return 'CloudNode'
+        res = None
+        for c in entity.containers:
+            res = lookup_Container(c, eid)
+            if res:
+                break
+        return res
+    
+    def lookup_Container(entity, eid):
+        if eid == entity.id:
+            return 'Container'
+        return None
+    
+    def lookup_NetworkLayer(entity, eid):
+        res = None
+        for n in entity.netnodes:
+            res = lookup_Netnode(n, eid)
+            if res:
+                break
+        if res:
+            return res
+        for e in entity.edgeservers:
+            res = lookup_EdgeServer(e, eid)
+            if res:
+                break
+        return res
+    
+    def lookup_Netnode(entity, eid):
+        if eid == entity.id:
+            return 'NetNode'
+        res = None
+        for c in entity.containers:
+            res = lookup_Container(c, eid)
+            if res:
+                break
+        return res
+    
+    def lookup_EdgeServer(entity, eid):
+        if eid == entity.id:
+            return 'EdgeServer'
+        res = None
+        for c in entity.containers:
+            res = lookup_Container(c, eid)
+            if res:
+                break
+        return res
+    
+    def lookup_EndLayer(entity, eid):
+        res = None
+        for r in entity.rooms:
+            res = lookup_Room(r, eid)
+            if res:
+                break
+        return res
+    
+    def lookup_Room(entity, eid):
+        res = None
+        for d in entity.devices:
+            res = lookup_Device(d, eid)
+            if res:
+                break
+        if res:
+            return res
+        for w in entity.workers:
+            res = lookup_Worker(w, eid)
+            if res:
+                break
+        if res:
+            return res
+        for a in entity.applications:
+            res = lookup_Application(a, eid)
+            if res:
+                break
+        return res
+    
+    def lookup_Device(entity, eid):
+        if eid == entity.id:
+            return entity.name
+        return None
+    
+    def lookup_Worker(entity, eid):
+        if eid == entity.id:
+            return entity.name
+    
+    def lookup_Application(entity, eid):
+        if eid == entity.id:
+            return entity.name
+   
+    return lookup_App(entity, eid)
+
+def pack(demands, resources, res, rtype):
     if rtype == 'json':
-        return json.dumps(res)
+        result = []
+        for did, rid in res.items():
+            item = {'did': did,
+                    'rid': rid,
+                    'dtype': search_for_type(demands, did),
+                    'rtype': search_for_type(resources, rid)}
+            result.append(item)
+        return json.dumps(result)
     elif rtype == 'proto':
+        raise Exception(f'not support now')
         result = result_pb2.Result()
         result.appname = demands.name
         for did, sid in res.items():

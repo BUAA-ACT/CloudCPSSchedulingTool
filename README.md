@@ -46,13 +46,13 @@ message CloudNode {
 }
 ```
 
-当需求端与资源端的`CloudLayer`进行匹配时，将`DataCenter`实体视作抽象节点，调度问题被转化为传统二分图匹配问题。下图中![](http://latex.codecogs.com/gif.latex?\\D_1, D_2, D_3) 表示需求描述`CloudLayer`中的所有`DataCenter`，![](http://latex.codecogs.com/gif.latex?\\d_1, d_2, d_3) 表示资源描述`CloudLayer`中所有的`DataCenter`。
+当需求端与资源端的`CloudLayer`进行匹配时，将`DataCenter`实体视作抽象节点，调度问题被转化为传统二分图匹配问题。下图中![](http://latex.codecogs.com/gif.latex?\\D_1%2cD_2%2cD_3) 表示需求描述`CloudLayer`中的所有`DataCenter`，![](http://latex.codecogs.com/gif.latex?\\d_1%2cd_2%2cd_3) 表示资源描述`CloudLayer`中所有的`DataCenter`。
 
 <img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdraorqt0rj30xe0u0who.jpg" alt="image-20200412210154856" style="zoom:33%;" />
 
 此时，若![](http://latex.codecogs.com/gif.latex?\\D_1) 与![](http://latex.codecogs.com/gif.latex?\\d_1) 匹配，则需要满足![](http://latex.codecogs.com/gif.latex?\\D_1) 与 ![](http://latex.codecogs.com/gif.latex?\\d_1) 中的`CloudNode`能够匹配。
 
-我们继续将`CloudNode`实体视作抽象节点进行二分图匹配。如下图所示，![](http://latex.codecogs.com/gif.latex?\\C_1, C_2) 为`DataCenter`![](http://latex.codecogs.com/gif.latex?\\D_1) 中的`CloudNode`，![](http://latex.codecogs.com/gif.latex?\\c_1, c_2, c_3) 为`DataCenter` ![](http://latex.codecogs.com/gif.latex?\\d_1) 中的`CloudNode`。
+我们继续将`CloudNode`实体视作抽象节点进行二分图匹配。如下图所示，![](http://latex.codecogs.com/gif.latex?\\C_1%2c+C_2) 为`DataCenter`![](http://latex.codecogs.com/gif.latex?\\D_1) 中的`CloudNode`，![](http://latex.codecogs.com/gif.latex?\\c_1%2c+c_2%2c+c_3) 为`DataCenter` ![](http://latex.codecogs.com/gif.latex?\\d_1) 中的`CloudNode`。
 
 <img src="https://tva1.sinaimg.cn/large/007S8ZIlly1gdraykifwqj315w0u0gpc.jpg" alt="Snip20200412_9" style="zoom:33%;" />
 

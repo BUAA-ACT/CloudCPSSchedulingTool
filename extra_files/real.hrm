@@ -1,0 +1,99 @@
+{
+  "Type": "",
+  "Description": "",
+  "AppID": "0",
+  "Name": "单机计算多机计算模型",
+  "EndLayer": {
+    "Devices": [
+      {
+        "Description": "用于计算以及显示",
+        "Servicetime": "",
+        "DeviceID": "15",
+        "TID": "",
+        "Location": "",
+        "Name": ""
+      }
+    ],
+    "Rooms": [
+      {
+        "Devices": [
+          {
+            "Description": "用于显示",
+            "Servicetime": "",
+            "DeviceID": "12",
+            "TID": "",
+            "Location": "",
+            "Name": ""
+          },
+          {
+            "Description": "用于显示",
+            "Servicetime": "",
+            "DeviceID": "13",
+            "TID": "",
+            "Location": "",
+            "Name": ""
+          }
+        ]
+      }
+    ]
+  },
+  "CloudLayer": {
+    "Datacenters": [
+      {
+        "Reserveresource": "",
+        "Number": "",
+        "Availableresource": "",
+        "DatacenterID": "5",
+        "Location": "",
+        "CloudNodes": [
+          {
+            "Status": "",
+            "Reserveresource": "",
+            "Availableresource": "",
+            "Host": "",
+            "CloudNodeID": "6",
+            "Containers_num": "",
+            "Containers": [
+              {
+                "Status": "",
+                "APPID": "",
+                "Resource": "",
+                "Host": "",
+                "ContainerID": "7"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "NetworkLayer": {
+    "NetNodes": [
+      {
+        "Type": "",
+        "List": "",
+        "NetNodeID": "8",
+        "Connecting": "",
+        "Location": ""
+      }
+    ]
+  },
+  "Links": [
+    {
+      "source": "7",
+      "target": "8"
+    },
+    {
+      "source": "8",
+      "target": "15"
+    },
+    {
+      "source": "8",
+      "target": "13"
+    },
+    {
+      "source": "8",
+      "target": "12"
+    }
+  ]
+}

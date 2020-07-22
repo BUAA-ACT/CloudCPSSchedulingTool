@@ -51,16 +51,19 @@ def load_balancing_by_nodes(node_infos, threshold):
         each_node_contract_list.append(contract_list)
         #  print(json.dumps(data, indent=2, separators=(',', ':')))
 
-
-    _schedule_for_storage(storage_list,
+    ok = _schedule_for_storage(storage_list,
             traffic_list, storage_rest,
             traffic_rest, threshold, 
             each_node_contract_list)
+    if not ok:
+        return ""
 
-    _schedule_for_traffic(storage_list,
+    ok = _schedule_for_traffic(storage_list,
             traffic_list, storage_rest,
             traffic_rest, threshold,
             each_node_contract_list)
+    if not ok:
+        return ""
 
     resp = []
     for contract_list in each_node_contract_list:
@@ -84,20 +87,42 @@ def _schedule_for_storage(storage_list,
         dest_tra = traffic_list[dest_node_idx]
         dest_rest_sto = storage_rest[dest_node_idx][1]
         dest_rest_tra = traffic_rest[dest_node_idx][1]
-        while True:
+        while src_rest_sto < threshold * src_sto:
             contract = contract_list[src_rest_idx][0]
             if dest_rest_sto - contract.storage > threshold * dest_sto \
                     and dest_rest_tra - contract.traffic > threshold * dest_tra:
                 # ok to transfer
+                storage_rest[src_rest_idx][1] += contract.storage
+                traffic_rest[src_rest_idx][1] += contract.traffic
+                storage_rest[dest_node_idx][1] -= contract.storage
+                traffic_rest[dest_node_idx][1] -= contract.traffic
+                src_rest_sto += contract.storage
+                src_rest_tra += contract.traffic
+                dest_rest_sto -= contract.storage
+                dest_rest_tra -= contract.traffic
+                contract_list[src_node_idx].append(contract)
+                contract_list[dest_node_idx].pop(0)
             else:
-                return False
+                break
+        return src_rest_sto > threshold * src_sto
 
     storage_rest.sort(key=takeSecond)
+    index = len(storage_rest) - 1
     for rest in reversed(storage_rest):
         node_idx, rest_sto = rest
         if rest_sto > threshold * storage_list[node_idx]:
             break
         # transfer...
+        ok = False
+        for tf_idx in range(index):
+            ret = transfer(index, node_idx,
+                    storage_rest[tf_idx][0], tf_idx)
+            if ret:
+                ok = True
+                break
+        if not ok:
+            return False
+    return True
 
 def _schedule_for_traffic(storage_list,
         traffic_list, storage_rest, traffic_rest,
@@ -105,8 +130,52 @@ def _schedule_for_traffic(storage_list,
     def takeSecond(elem):
         return elem[1]
     
+    def transfer(src_node_idx, src_rest_idx,
+            dest_node_idx, dest_rest_idx):
+        src_sto = storage_list[src_node_idx]
+        src_tra = traffic_list[src_node_idx]
+        src_rest_sto = storage_rest[src_rest_idx][1]
+        src_rest_tra = traffic_rest[src_rest_idx][1]
+        dest_sto = storage_list[dest_node_idx]
+        dest_tra = traffic_list[dest_node_idx]
+        dest_rest_sto = storage_rest[dest_node_idx][1]
+        dest_rest_tra = traffic_rest[dest_node_idx][1]
+        while src_rest_tra < threshold * src_tra:
+            contract = contract_list[src_rest_idx][0]
+            if dest_rest_sto - contract.storage > threshold * dest_sto \
+                    and dest_rest_tra - contract.traffic > threshold * dest_tra:
+                # ok to transfer
+                storage_rest[src_rest_idx][1] += contract.storage
+                traffic_rest[src_rest_idx][1] += contract.traffic
+                storage_rest[dest_node_idx][1] -= contract.storage
+                traffic_rest[dest_node_idx][1] -= contract.traffic
+                src_rest_sto += contract.storage
+                src_rest_tra += contract.traffic
+                dest_rest_sto -= contract.storage
+                dest_rest_tra -= contract.traffic
+                contract_list[src_node_idx].append(contract)
+                contract_list[dest_node_idx].pop(0)
+            else:
+                break
+        return src_rest_tra > threshold * src_tra
+
     traffic_rest.sort(key=takeSecond)
-    pass
+    index = len(traffic_rest) - 1
+    for rest in reversed(traffic_rest):
+        node_idx, rest_tra = rest
+        if rest_tra > threshold * traffic_list[node_idx]:
+            break
+        # transfer...
+        ok = False
+        for tf_idx in range(index):
+            ret = transfer(index, node_idx,
+                    traffic_rest[tf_idx][0], tf_idx)
+            if ret:
+                ok = True
+                break
+        if not ok:
+            return False
+    return True
 
 if __name__ == "__main__":
     privateKey = "ab8c753378a031976cf2a848e57299240cdbbdecf36e726aa8a1e4a9fa9046e1"

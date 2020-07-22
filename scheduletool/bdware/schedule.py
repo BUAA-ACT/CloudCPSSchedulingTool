@@ -88,7 +88,7 @@ def _schedule_for_storage(storage_list,
         dest_rest_sto = storage_rest[dest_node_idx][1]
         dest_rest_tra = traffic_rest[dest_node_idx][1]
         while src_rest_sto < threshold * src_sto:
-            contract = contract_list[src_rest_idx][0]
+            contract = each_node_contract_list[src_rest_idx][0]
             if dest_rest_sto - contract.storage > threshold * dest_sto \
                     and dest_rest_tra - contract.traffic > threshold * dest_tra:
                 # ok to transfer
@@ -100,8 +100,8 @@ def _schedule_for_storage(storage_list,
                 src_rest_tra += contract.traffic
                 dest_rest_sto -= contract.storage
                 dest_rest_tra -= contract.traffic
-                contract_list[src_node_idx].append(contract)
-                contract_list[dest_node_idx].pop(0)
+                each_node_contract_list[src_node_idx].append(contract)
+                each_node_contract_list[dest_node_idx].pop(0)
             else:
                 break
         return src_rest_sto > threshold * src_sto
@@ -141,7 +141,7 @@ def _schedule_for_traffic(storage_list,
         dest_rest_sto = storage_rest[dest_node_idx][1]
         dest_rest_tra = traffic_rest[dest_node_idx][1]
         while src_rest_tra < threshold * src_tra:
-            contract = contract_list[src_rest_idx][0]
+            contract = each_node_contract_list[src_rest_idx][0]
             if dest_rest_sto - contract.storage > threshold * dest_sto \
                     and dest_rest_tra - contract.traffic > threshold * dest_tra:
                 # ok to transfer
@@ -153,8 +153,8 @@ def _schedule_for_traffic(storage_list,
                 src_rest_tra += contract.traffic
                 dest_rest_sto -= contract.storage
                 dest_rest_tra -= contract.traffic
-                contract_list[src_node_idx].append(contract)
-                contract_list[dest_node_idx].pop(0)
+                each_node_contract_list[src_node_idx].append(contract)
+                each_node_contract_list[dest_node_idx].pop(0)
             else:
                 break
         return src_rest_tra > threshold * src_tra
@@ -192,5 +192,5 @@ if __name__ == "__main__":
         "storage": 100.0,
         "traffic": 100.0
     }]
-    threshold = 0.8
-    load_balancing_by_nodes(node_infos, threshold)
+    threshold = 0.2
+    print(load_balancing_by_nodes(node_infos, threshold))

@@ -3,10 +3,9 @@
 # Python release: 3.7.0
 # Create time: 2020-07-20
 import sys
-sys.path.append("./proto")
 import grpc
-import scheduletool.bdware.proto.schedule_service_pb2 as schedule_pb2
-import scheduletool.bdware.proto.schedule_service_pb2_grpc as schedule_service_pb2_grpc
+from .proto import schedule_service_pb2 as schedule_pb2
+from .proto import schedule_service_pb2_grpc as schedule_service_pb2_grpc
 
 class ScheduleClient(object):
     def __init__(self):

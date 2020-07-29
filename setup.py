@@ -3,6 +3,15 @@
 # Python release: 3.7.0
 # Create time: 2020-04-04
 from setuptools import setup, find_packages
+from grpc_tools import protoc
+
+# run bdware proto codegen
+protoc.main((
+    '',
+    '-I.',
+    '--python_out=.',
+    '--grpc_python_out=.',
+    './scheduletool/bdware/proto/schedule_service.proto', ))
 
 setup(
     name='scheduling-tool',
@@ -13,7 +22,7 @@ setup(
     author='barriery',
     url='https://github.com/barrierye/SchedulingTool',
     install_requires=[
-        'protobuf==3.11.3',
+        'protobuf>=3.12.2',
         'PyMySQL==0.9.3',
         'sshtunnel==0.1.5',
     ],

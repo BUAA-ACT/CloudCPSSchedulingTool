@@ -3,6 +3,15 @@
 # Python release: 3.7.0
 # Create time: 2020-04-04
 from setuptools import setup, find_packages
+from grpc_tools import protoc
+
+# run bdware proto codegen
+protoc.main((
+    '',
+    '-I.',
+    '--python_out=.',
+    '--grpc_python_out=.',
+    './scheduletool/bdware/proto/schedule_service.proto', ))
 
 setup(
     name='scheduling-tool',

@@ -3,9 +3,9 @@
 # Python release: 3.7.0
 # Create time: 2020-03-14
 import json
-import bdcaller
+import scheduletool.bdware.bdcaller as bdcaller
 import requests
-from sm2_util import JsSM2Executor as SM2Executor
+from scheduletool.bdware.sm2_util import JsSM2Executor as SM2Executor
 
 class QueryExecutor(object):
     def __init__(self):

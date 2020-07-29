@@ -3,7 +3,7 @@
 # Python release: 3.7.0
 # Create time: 2020-07-14
 import json
-from query import QueryExecutor
+from scheduletool.bdware.query import QueryExecutor
 from operator import itemgetter, attrgetter
 
 def load_balancing_by_node_centor(node_center, privateKey, publicKey):

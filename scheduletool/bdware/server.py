@@ -3,15 +3,14 @@
 # Python release: 3.7.0
 # Create time: 2020-07-19
 import sys
-sys.path.append("./proto")
 import grpc
-import schedule
+import scheduletool.bdware.schedule as schedule
 from concurrent import futures
 import contextlib
 import socket
 from contextlib import closing
-import proto.schedule_service_pb2_grpc as schedule_service_pb2_grpc
-import proto.schedule_service_pb2 as schedule_pb2
+import scheduletool.bdware.proto.schedule_service_pb2_grpc as schedule_service_pb2_grpc
+import scheduletool.bdware.proto.schedule_service_pb2 as schedule_pb2
 
 class ScheduleServicer(schedule_service_pb2_grpc.ScheduleServiceServicer):
     def __init__(self):

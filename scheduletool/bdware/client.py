@@ -5,8 +5,8 @@
 import sys
 sys.path.append("./proto")
 import grpc
-import proto.schedule_service_pb2 as schedule_pb2
-import proto.schedule_service_pb2_grpc as schedule_service_pb2_grpc
+import scheduletool.bdware.proto.schedule_service_pb2 as schedule_pb2
+import scheduletool.bdware.proto.schedule_service_pb2_grpc as schedule_service_pb2_grpc
 
 class ScheduleClient(object):
     def __init__(self):

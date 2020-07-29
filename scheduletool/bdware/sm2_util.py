@@ -5,7 +5,7 @@
 import execjs
 import json
 import requests
-from scheduletool.bdware.bdcaller import BDCaller
+from .bdcaller import BDCaller
 
 class SM2Executor(object):
     def __init__(self, publicKey, privateKey):

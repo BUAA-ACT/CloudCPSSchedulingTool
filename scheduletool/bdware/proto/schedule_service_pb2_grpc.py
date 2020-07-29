@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import scheduletool.bdware.proto.schedule_service_pb2 as schedule__service__pb2
+import schedule_service_pb2 as schedule__service__pb2
 
 
 class ScheduleServiceStub(object):

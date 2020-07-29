@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package schedule.bdware;
+
+message NodeInfo {
+    string home = 1;
+    float storage = 2; // B
+    float traffic = 3; // B
+}
+
+message LoadBalancingByNodesRequest {
+    repeated NodeInfo nodes = 1;
+    float threshold = 2; // [0, 1]
+}
+
+message LoadBalancingByNodesResponse {
+    string json_str = 1;
+}
+
+service ScheduleService {
+    rpc LoadBalancingByNodes(LoadBalancingByNodesRequest) returns (LoadBalancingByNodesResponse) {}
+}

@@ -5,9 +5,9 @@
 import json
 from google.protobuf import text_format
 
-from . import database
-from . import entity_pb2
-from . import result_pb2
+from cps import database
+from cps import entity_pb2
+from cps import result_pb2
 
 def parse_json_to_entity(jsonObj, entype):
 

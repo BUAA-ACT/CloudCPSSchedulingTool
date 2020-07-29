@@ -39,13 +39,13 @@ if __name__ == "__main__":
     client.connect(["127.0.0.1:18080"])
     node_infos = [{
         "home": "http://127.0.0.1:8080/SCIDE/SCManager",
-        "storage": 100.0,
-        "traffic": 100.0
+        "storage": 101940000000,
+        "traffic": 200000
     }, {
         "home": "http://127.0.0.1:9090/SCIDE/SCManager",
-        "storage": 100.0,
-        "traffic": 100.0
+        "storage": 201440000000,
+        "traffic": 200000,
     }]
-    threshold = 0.2 # rest
+    threshold = 0.8
     json_str = client.query_lb_by_nodes(node_infos, threshold)
     print(json_str)

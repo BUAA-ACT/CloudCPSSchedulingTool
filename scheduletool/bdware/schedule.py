@@ -24,8 +24,10 @@ def query_deployed_cluster(clusters, threshold, contract):
     for cluster in clusters:
         if cluster.remain_storage >= contract.storage \
                 and cluster.remain_traffic >= contract.traffic:
+            logging.info("Succ to schedule: {}".format(cluster.name))
             return cluster.name
 
+    logging.error("Failed to schedule.")
     return None
 
 def _print_cluster_state(clusters):
@@ -56,7 +58,7 @@ def load_balancing_by_nodes(clusters, threshold):
                 break
             index += 1
         if index == len(clusters):
-            logging.info("succ to transfer")
+            logging.info("Succ to transfer")
             break
 
         contract = None
@@ -84,7 +86,7 @@ def load_balancing_by_nodes(clusters, threshold):
                         "src": cluster.name,
                         "dst": clusters[index].name,
                     }
-                    logging.info("Succ to transfer: {}".format(transfer))
+                    logging.info("Succ to transfer one contract: {}".format(transfer))
                     break
 
         if transfer is None:

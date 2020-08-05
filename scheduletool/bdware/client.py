@@ -21,9 +21,8 @@ class ScheduleClient(object):
         self._channel = grpc.insecure_channel(g_endpoint, options=options)
         self._stub = schedule_service_pb2_grpc.ScheduleServiceStub(self._channel)
 
-    def query_lb_by_nodes(self, clusters, threshold):
-        req = schedule_pb2.LoadBalancingByNodesRequest()
-        req.threshold = threshold
+    def _pack_clusters(self, clusters):
+        pb_clusters = []
         for cluster in clusters:
             pb_cluster = schedule_pb2.ClusterInfo()
             pb_cluster.name = cluster["name"]
@@ -33,7 +32,26 @@ class ScheduleClient(object):
                 pb_node.storage = node["storage"]
                 pb_node.traffic = node["traffic"]
                 pb_cluster.nodes.append(pb_node)
-            req.clusters.append(pb_cluster)
+            pb_clusters.append(pb_cluster)
+        return pb_clusters
+
+    def query_deployed_cluster(self, clusters, threshold, contract):
+        req = schedule_pb2.QueryDeployedClusterRequest()
+        req.threshold = threshold
+        pb_clusters = self._pack_clusters(clusters)
+        req.clusters.extend(pb_clusters)
+        req.contract.storage = contract["storage"]
+        req.contract.traffic = contract["traffic"]
+        resp = self._stub.QueryDeployedCluster(req)
+        if resp.error_code != 0:
+            return None
+        return resp.cluster_name
+
+    def query_lb_by_nodes(self, clusters, threshold):
+        req = schedule_pb2.LoadBalancingByNodesRequest()
+        req.threshold = threshold
+        pb_clusters = self._pack_clusters(clusters)
+        req.clusters.extend(pb_clusters)
         resp = self._stub.LoadBalancingByNodes(req)
         if resp.error_code != 0:
             return None
@@ -53,17 +71,24 @@ if __name__ == "__main__":
         "name": "cluster1",
         "nodes": [{
             "home": "http://127.0.0.1:8080/SCIDE/SCManager",
-            "storage": "1 MB",
-            "traffic": "2 MB",
+            "storage": "1 GB",
+            "traffic": "20 MB",
         }],
     }, {
         "name": "cluster2",
         "nodes": [{
             "home": "http://127.0.0.1:9090/SCIDE/SCManager",
-            "storage": "1 MB",
-            "traffic": "2 MB",
+            "storage": "135 MB",
+            "traffic": "120 B",
         }],
     }]
     threshold = 0.8
     transfers = client.query_lb_by_nodes(clusters, threshold)
     print(json.dumps(transfers, indent=4, separators=(',', ':')))
+
+    contract = {
+        "storage": "1 MB",
+        "traffic": "1 B",
+    }
+    cluster_name = client.query_deployed_cluster(clusters, threshold, contract)
+    print(cluster_name)

@@ -4,7 +4,9 @@
 # Create time: 2020-07-14
 import json
 from .query import QueryExecutor
+from .entity import Contract, Node, Cluster
 from operator import itemgetter, attrgetter
+import logging
 
 def load_balancing_by_node_centor(node_center, privateKey, publicKey):
     q = QueryExecutor()
@@ -14,116 +16,86 @@ def load_balancing_by_node_centor(node_center, privateKey, publicKey):
     # TODO
     return None
 
-def load_balancing_by_nodes(node_infos, threshold):
-    class Contract(object):
-        def __init__(self, cid, storage, traffic):
-            self.cid = cid
-            value, uint = storage.split(" ")
-            if uint == "B":
-                value = float(value)
-            elif uint == "KB":
-                value = 1000 * float(value)
-            elif uint == "MB":
-                value = 1000000 * float(value)
-            elif uint == "GB":
-                value = 1000000000 * float(value)
-            elif uint == "TB":
-                value = 1000000000000 * float(value)
-            else:
-                raise Exception("error unit: {}".format(uint))
-            self.storage = value
-            value, uint = traffic.split(" ")
-            if uint == "B":
-                value = float(value)
-            elif uint == "KB":
-                value = 1000 * float(value)
-            elif uint == "MB":
-                value = 1000000 * float(value)
-            elif uint == "GB":
-                value = 1000000000 * float(value)
-            elif uint == "TB":
-                value = 1000000000000 * float(value)
-            else:
-                raise Exception("error unit: {}".format(uint))
-            self.traffic = value
-        def __cmp__(self, other):
-            if self.storage == other.storage:
-                if self.traffic == other.traffic:
-                    return 0
-                elif self.traffic < other.traffic:
-                    return -1
-                else:
-                    return 1
-            elif self.storage < other.storage:
-                return -1
-            else:
-                return 1
-
-    query_exe = QueryExecutor()
-    node_homes = []
-    nodes = {}
-    for idx, node in enumerate(node_infos):
-        node_home = node["home"]
-        node_homes.append(node_home)
-        nodes[node_home] = {
-            "contracts": [],
-            "storage": node["storage"],
-            "traffic": node["traffic"],
-        }
-        data = query_exe.queryNodeInfo(node_home)
-        contracts = []
-        for contract_data in data:
-            contract = Contract(
-                    contract_data["id"],
-                    contract_data["storage"],
-                    contract_data["traffic"])
-            contracts.append(contract)
-        contracts = sorted(contracts, key=attrgetter("storage", "traffic"))
-        nodes[node_home]["contracts"] = contracts
+def query_deployed_cluster(clusters, threshold, contract):
+    for cluster in clusters:
+        cluster.init(threshold)
+        cluster.calculate_storage_and_traffic()
     
-    res = {}
-    remain_contracts = []
-    for home, node in nodes.items():
-        res[home] = {
-            "contracts": [],
-            "storage": None,
-            "traffic": None,
-        }
-        remain_sto = node["storage"] * threshold
-        remain_tra = node["traffic"] * threshold
-        idx = 0
-        for contract in node["contracts"]:
-            if remain_sto < contract.storage:
-                break
-            if remain_tra < contract.traffic:
-                break
-            remain_sto -= contract.storage
-            remain_tra -= contract.traffic
-            res[home]["contracts"].append(contract)
-            idx += 1
-        res[home]["storage"] = remain_sto
-        res[home]["traffic"] = remain_tra
-        remain_contracts.extend(node["contracts"][idx:])
+    for cluster in clusters:
+        if cluster.remain_storage >= contract.storage \
+                and cluster.remain_traffic >= contract.traffic:
+            return cluster.name
 
-    succ = True
-    for contract in remain_contracts:
-        succ = False
-        for home, node in res.items():
-            if node["storage"] >= contract.storage \
-                    and node["traffic"] >= contract.traffic:
-                res[home]["contracts"].append(contract)
-                res[home]["storage"] -= contract.storage
-                res[home]["traffic"] -= contract.traffic
-                succ = True
+    return None
+
+def _print_cluster_state(clusters):
+    logging.debug("===== state =====")
+    for cluster in clusters:
+        logging.debug("Cluster({}): {}".format(cluster.name, cluster.contracts.keys()))
+    logging.debug("=================")
+
+def load_balancing_by_nodes(clusters, threshold):
+    tot_contract_count = 0
+    for cluster in clusters:
+        cluster.init(threshold)
+        logging.debug("succ init cluster: {}".format(cluster.name))
+        tot_contract_count += len(cluster.contracts)
+
+    transfers = []
+    step = 0
+    while step < tot_contract_count:
+        for cluster in clusters:
+            cluster.calculate_storage_and_traffic()
+        _print_cluster_state(clusters)
+        index = 0
+        for cluster in clusters:
+            logging.debug("cluster({}) remain_storage: {}, remain_traffic: {}"
+                    .format(cluster.name, cluster.remain_storage, cluster.remain_traffic))
+            if cluster.remain_storage < 0 \
+                    or cluster.remain_traffic < 0:
                 break
-        if succ is False:
+            index += 1
+        if index == len(clusters):
+            logging.info("succ to transfer")
             break
+
+        contract = None
+        if clusters[index].remain_storage < 0:
+            contract = cluster.max_storage_contract()
+        elif clusters[index].remain_traffic < 0:
+            contract = cluster.max_traffic_contract()
+        logging.debug("contract(id: {}, storage: {}, traffic: {}) "
+                "in cluster({}) should be transfered".format(
+                    contract.cid, contract.storage, contract.traffic,
+                    clusters[index].name))
+
+        transfer = None
+        for idx, cluster in enumerate(clusters):
+            if idx != index:
+                if cluster.check_can_add_contract(contract):
+                    logging.debug("try add contract(cid: {}, storage: {}, traffic: {}) to cluster({})"
+                            .format(contract.cid, contract.storage, contract.traffic, cluster.name))
+                    cluster.add_contract(contract)
+                    logging.debug("try rm contract(cid: {}, storage: {}, traffic: {}) from cluster({})"
+                            .format(contract.cid, contract.storage, contract.traffic, clusters[index].name))
+                    clusters[index].remove_contract(contract.cid)
+                    transfer = {
+                        "cid": contract.cid,
+                        "src": cluster.name,
+                        "dst": clusters[index].name,
+                    }
+                    logging.info("Succ to transfer: {}".format(transfer))
+                    break
+
+        if transfer is None:
+            logging.debug("Failed to transfer.")
+            break
+        transfers.append(transfer)
+        step += 1
     
-    resp = {}
-    if succ:
-        for home, node in res.items():
-            resp[home] = [c.cid for c in node["contracts"]]
-    return json.dumps(resp)
+    if step >= tot_contract_count:
+        return None
+    return transfers
 
 if __name__ == "__main__":
     privateKey = "ab8c753378a031976cf2a848e57299240cdbbdecf36e726aa8a1e4a9fa9046e1"

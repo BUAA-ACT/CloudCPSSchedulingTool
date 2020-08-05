@@ -3,6 +3,7 @@
 # Python release: 3.7.0
 # Create time: 2020-07-20
 import sys
+import json
 import grpc
 from .proto import schedule_service_pb2 as schedule_pb2
 from .proto import schedule_service_pb2_grpc as schedule_service_pb2_grpc
@@ -20,31 +21,49 @@ class ScheduleClient(object):
         self._channel = grpc.insecure_channel(g_endpoint, options=options)
         self._stub = schedule_service_pb2_grpc.ScheduleServiceStub(self._channel)
 
-    def query_lb_by_nodes(self, node_infos, threshold):
+    def query_lb_by_nodes(self, clusters, threshold):
         req = schedule_pb2.LoadBalancingByNodesRequest()
         req.threshold = threshold
-        for node_info in node_infos:
-            node_info_pb = schedule_pb2.NodeInfo()
-            node_info_pb.home = node_info["home"]
-            node_info_pb.storage = node_info["storage"]
-            node_info_pb.traffic = node_info["traffic"]
-            req.nodes.append(node_info_pb)
+        for cluster in clusters:
+            pb_cluster = schedule_pb2.ClusterInfo()
+            pb_cluster.name = cluster["name"]
+            for node in cluster["nodes"]:
+                pb_node = schedule_pb2.NodeInfo()
+                pb_node.home = node["home"]
+                pb_node.storage = node["storage"]
+                pb_node.traffic = node["traffic"]
+                pb_cluster.nodes.append(pb_node)
+            req.clusters.append(pb_cluster)
         resp = self._stub.LoadBalancingByNodes(req)
-        json_str = resp.json_str
-        return json_str
+        if resp.error_code != 0:
+            return None
+        transfers = []
+        for pb_transfer in resp.transfers:
+            transfers.append({
+                "contract_id": pb_transfer.contract_id,
+                "cluster_src": pb_transfer.cluster_src,
+                "cluster_dst": pb_transfer.cluster_dst,
+            })
+        return transfers
 
 if __name__ == "__main__":
     client = ScheduleClient()
     client.connect(["127.0.0.1:18080"])
-    node_infos = [{
-        "home": "http://127.0.0.1:8080/SCIDE/SCManager",
-        "storage": 101940000000,
-        "traffic": 200000
+    clusters = [{
+        "name": "cluster1",
+        "nodes": [{
+            "home": "http://127.0.0.1:8080/SCIDE/SCManager",
+            "storage": "1 MB",
+            "traffic": "2 MB",
+        }],
     }, {
-        "home": "http://127.0.0.1:9090/SCIDE/SCManager",
-        "storage": 201440000000,
-        "traffic": 200000,
+        "name": "cluster2",
+        "nodes": [{
+            "home": "http://127.0.0.1:9090/SCIDE/SCManager",
+            "storage": "1 MB",
+            "traffic": "2 MB",
+        }],
     }]
     threshold = 0.8
-    json_str = client.query_lb_by_nodes(node_infos, threshold)
-    print(json_str)
+    transfers = client.query_lb_by_nodes(clusters, threshold)
+    print(json.dumps(transfers, indent=4, separators=(',', ':')))

@@ -9,6 +9,7 @@ from concurrent import futures
 import contextlib
 import socket
 from contextlib import closing
+from .entity import Contract, Node, Cluster
 from .proto import schedule_service_pb2_grpc
 from .proto import schedule_service_pb2 as schedule_pb2
 
@@ -16,19 +17,48 @@ class ScheduleServicer(schedule_service_pb2_grpc.ScheduleServiceServicer):
     def __init__(self):
         pass
     
+    def _parse_clusters_pb(self, pb_clusters):
+        clusters = []
+        for pb_cluster in pb_clusters:
+            nodes = {}
+            for pb_node in pb_cluster.nodes:
+                nodes[pb_node.home] = Node(pb_node.home, pb_node.storage, pb_node.traffic)
+            clusters.append(Cluster(pb_cluster.name, nodes))
+        return clusters
+
+    def _parse_contract_pb(self, pb_contract):
+        contract = Contract(None, pb_contract.storage, pb_contract.traffic)
+        return contract
+
+    def QueryDeployedCluster(self, requests, content):
+        clusters = self._parse_clusters_pb(requests.clusters)
+        contract = self._parse_contract_pb(requests.contract)
+        threshold = requests.threshold
+        cluster_name = schedule.query_deployed_cluster(clusters, threshold, contract)
+        resp = schedule_pb2.QueryDeployedClusterResponse()
+        resp.error_code = 0
+        if cluster_name is None:
+            resp.error_code = -1
+            return resp
+        resp.cluster_name = cluster_name
+        return resp
+
     def LoadBalancingByNodes(self, requests, content):
-        node_infos = []
-        for node_info_pb in requests.nodes:
-            node_infos.append({
-                "home": node_info_pb.home,
-                "storage": node_info_pb.storage,
-                "traffic": node_info_pb.traffic
-            })
+        clusters = self._parse_clusters_pb(requests.clusters)
         threshold = requests.threshold 
-        json = schedule.load_balancing_by_nodes(node_infos, threshold)
-        res = schedule_pb2.LoadBalancingByNodesResponse()
-        res.json_str = json
-        return res
+        transfers = schedule.load_balancing_by_nodes(clusters, threshold)
+        resp = schedule_pb2.LoadBalancingByNodesResponse()
+        resp.error_code = 0
+        if transfers is None:
+            resp.error_code = -1
+            return resp
+        for transfer in transfers:
+            pb_transfer = schedule_pb2.ContractTransfer()
+            pb_transfer.contract_id = transfer["cid"]
+            pb_transfer.cluster_src = transfer["src"]
+            pb_transfer.cluster_dst = transfer["dst"]
+            resp.transfers.append(pb_transfer)
+        return resp
 
 class ScheduleServer(object):
     def __init__(self):
@@ -41,8 +71,8 @@ class ScheduleServer(object):
         return result != 0
 
     def start(self, worker_num, port):
-        if not self._port_is_available(port):
-            raise SystemExit("Port already use: {}".format(port))
+        #if not self._port_is_available(port):
+        #    raise SystemExit("Port already use: {}".format(port))
         server = grpc.server(
                 futures.ThreadPoolExecutor(max_workers=worker_num))
         schedule_service_pb2_grpc.add_ScheduleServiceServicer_to_server(

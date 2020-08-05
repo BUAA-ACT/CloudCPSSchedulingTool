@@ -42,7 +42,7 @@ pip install -U dist/scheduling_tool*
 
 问最少需要做多少次操作，每次操作是什么？
 
-![image-20200805192406867](/Users/barriery/Library/Application Support/typora-user-images/image-20200805192406867.png)
+![image-20200805192406867](extra_files/bdware.png)
 
 目前是暴力贪心实现，还没有什么思路。
 

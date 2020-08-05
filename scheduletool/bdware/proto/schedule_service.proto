@@ -2,21 +2,50 @@ syntax = "proto3";
 
 package schedule.bdware;
 
+message ClusterInfo {
+    string name = 1;
+    repeated NodeInfo nodes = 2;
+}
+
 message NodeInfo {
     string home = 1;
-    float storage = 2; // B
-    float traffic = 3; // B
+    string storage = 2; // example: 123.0 B, 21.4 MB
+    string traffic = 3; // example: 123.0 B, 21.4 MB
+}
+
+message ContractInfo {
+    string storage = 1; // example: 123.0 B, 21.4 MB
+    string traffic = 2; // example: 123.0 B, 21.4 MB
 }
 
 message LoadBalancingByNodesRequest {
-    repeated NodeInfo nodes = 1;
+    repeated ClusterInfo clusters = 1;
     float threshold = 2; // [0, 1]
 }
 
+message ContractTransfer {
+    string contract_id = 1;
+    string cluster_src = 2;
+    string cluster_dst = 3;
+}
+
 message LoadBalancingByNodesResponse {
-    string json_str = 1;
+    repeated ContractTransfer transfers = 1;
+    int32 error_code = 2;
+}
+
+message QueryDeployedClusterRequest {
+    repeated ClusterInfo clusters = 1;
+    float threshold = 2; // [0, 1]
+    ContractInfo contract = 3;
+}
+
+message QueryDeployedClusterResponse {
+    string cluster_name = 1;
+    int32 error_code = 2;
 }
 
 service ScheduleService {
     rpc LoadBalancingByNodes(LoadBalancingByNodesRequest) returns (LoadBalancingByNodesResponse) {}
+    rpc QueryDeployedCluster(QueryDeployedClusterRequest) returns (QueryDeployedClusterResponse) {}
 }

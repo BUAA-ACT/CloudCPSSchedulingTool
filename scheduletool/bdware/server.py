@@ -53,11 +53,11 @@ class ScheduleServicer(schedule_service_pb2_grpc.ScheduleServiceServicer):
             resp.error_code = -1
             return resp
         for transfer in transfers:
-            pb_transfer = schedule_pb2.ContractTransfer()
-            pb_transfer.contract_id = transfer["cid"]
-            pb_transfer.cluster_src = transfer["src"]
-            pb_transfer.cluster_dst = transfer["dst"]
-            resp.transfers.append(pb_transfer)
+            resp.transfers.append(
+                    schedule_pb2.ContractTransfer(
+                        contract_id=transfer["cid"],
+                        cluster_src=transfer["src"],
+                        cluster_dst=transfer["dst"]))
         return resp
 
 class ScheduleServer(object):

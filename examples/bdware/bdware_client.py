@@ -28,3 +28,10 @@ if __name__ == "__main__":
     threshold = 0.8
     transfers = client.query_lb_by_nodes(clusters, threshold)
     print(json.dumps(transfers, indent=4, separators=(',', ':')))
+
+    contract = {
+        "storage": "1 MB",
+        "traffic": "1 B",
+    }
+    cluster_name = client.query_deployed_cluster(clusters, threshold, contract)
+    print(cluster_name)

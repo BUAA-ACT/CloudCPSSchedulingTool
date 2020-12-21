@@ -13,6 +13,20 @@ protoc.main((
     '--grpc_python_out=.',
     './scheduletool/bdware/proto/schedule_service.proto', ))
 
+protoc.main((
+    '',
+    '-I.',
+    '--python_out=.',
+    '--grpc_python_out=.',
+    './scheduletool/buaacps/proto/entity.proto', ))
+
+protoc.main((
+    '',
+    '-I.',
+    '--python_out=.',
+    '--grpc_python_out=.',
+    './scheduletool/buaacps/proto/result.proto', ))
+
 setup(
     name='scheduling-tool',
     packages=find_packages(where='.'),

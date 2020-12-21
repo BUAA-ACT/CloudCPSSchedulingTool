@@ -5,9 +5,9 @@
 import json
 from google.protobuf import text_format
 
-from cps import database
-from cps import entity_pb2
-from cps import result_pb2
+from . import database
+from .proto import entity_pb2
+from .proto import result_pb2
 
 def parse_json_to_entity(jsonObj, entype):
 
@@ -282,8 +282,9 @@ def queryResources(database):
 
     endlayer = entity_pb2.EndLayer()
     rooms_dict = {}
-    devices = database.queryItems('deviceinfo',
-                                  'inroom="True"')
+    devices = database.queryNewestItems('deviceinfo',
+                                        timelabel='time',
+                                        condition='inroom="True"')
     for device in devices:
         [did, localip, inroom, token, dtype, model,
                 name, data, location, timestamp] = device
@@ -686,7 +687,6 @@ if __name__ == '__main__':
     save_proto(resources, 'resources.prototxt')
     print_proto(demands)
     print_proto(resources)
-    result = schedule(demands, resources, rtype='proto')
-    print_proto(result)
+    result = schedule(demands, resources, rtype='json')
     writeToTable(database_manager, 'matchtable', result)
     database_manager.__del__()

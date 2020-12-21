@@ -1,0 +1,60 @@
+name: "resources"
+cloudlayer {
+  datacenters {
+    location: "Aliyun_Beijing"
+    cloudnodes {
+      id: "13076203676443154"
+      location: "BUAA_NMB"
+      cpu: 8.415
+      memory: 29986596.0
+      store: 251668508.0
+    }
+  }
+}
+networklayer {
+}
+endlayer {
+  rooms {
+    location: "NMB-G513"
+    devices {
+      name: "airpurifier"
+      id: "288438027"
+    }
+    devices {
+      name: "gateway"
+      id: "133638119"
+    }
+    devices {
+      name: "socket"
+      id: "236738672"
+    }
+    devices {
+      name: "fan"
+      id: "106456356"
+    }
+    devices {
+      name: "humidifier"
+      id: "134078488"
+    }
+    devices {
+      name: "weather"
+      id: "158d0002d798b6"
+    }
+    devices {
+      name: "magnet"
+      id: "158d0004318a22"
+    }
+    devices {
+      name: "vibration"
+      id: "158d0002c3b2d0"
+    }
+    devices {
+      name: "motion"
+      id: "158d0003f2959f"
+    }
+    devices {
+      name: "light"
+      id: "04CF8CAA9715"
+    }
+  }
+}

@@ -24,10 +24,12 @@ class DatabaseManager(object):
     def __del__(self):
         self.conn.close()
         self.server.stop()
-    def queryNewestItems(self, table, timelabel):
+    def queryNewestItems(self, table, timelabel, condition=None):
         with self.conn.cursor() as cursor:
             sql_cmd = f"select * from {table} where {timelabel}=" \
                     + f"(select max({timelabel}) from {table})"
+            if condition is not None:
+                sql_cmd += f" and {condition}"
             print(sql_cmd)
             cursor.execute(sql_cmd)
             data = cursor.fetchall()

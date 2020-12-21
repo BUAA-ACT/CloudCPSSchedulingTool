@@ -1,12 +1,6 @@
 {
   "Name": "testApp",
   "EndLayer": {
-    "Devices": [
-      {
-        "DeviceID": "15",
-        "Name": "xiaomi.wifispeaker.lx05"
-      }
-    ],
     "Rooms": [
       {
         "Location": "NMB-G513",
@@ -17,7 +11,7 @@
           },
           {
             "DeviceID": "13",
-            "Name": "pulg"
+            "Name": "magnet"
           }
         ]
       }
